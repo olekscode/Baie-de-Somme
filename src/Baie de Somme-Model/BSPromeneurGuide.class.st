@@ -13,7 +13,7 @@ BSPromeneurGuide class >> entityName [
 { #category : #pov }
 BSPromeneurGuide >> pov [
 
-	^ Color blue 
+	^ Color green  
 ]
 
 { #category : #pov }
