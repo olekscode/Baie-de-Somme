@@ -7,7 +7,8 @@ Class {
 		'thePromeneurSeuls',
 		'thePhoques',
 		'numberOfRows',
-		'numberOfColumns'
+		'numberOfColumns',
+		'home'
 	],
 	#category : #'Baie de Somme-Model'
 }
@@ -41,15 +42,15 @@ BSModel >> habitatTypeMatrix [
 	| matrix |
 	
 	matrix := #(
-		(2 2 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0)
-		(2 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(1 1 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0)
+		(1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 2 2 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 2 2 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 2 1 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -78,6 +79,18 @@ BSModel >> habitatTypeMatrix [
 	^ matrix
 ]
 
+{ #category : #accessing }
+BSModel >> home [
+
+	^ home
+]
+
+{ #category : #accessing }
+BSModel >> home: anObject [
+
+	home := anObject
+]
+
 { #category : #initialization }
 BSModel >> initialize [ 
 
@@ -97,11 +110,13 @@ BSModel >> initializeAgents [
 
 	self
 		createN: "self class initialNumberOfPromeneurGuides" 5
-		randomlyLocatedAloneEntities: BSPromeneurGuide.
+		entity: BSPromeneurGuide.
+		self thePromeneurGuides do: [ :guide | guide home: self home ].
 		
 	self
 		createN: "self class initialNumberOfPromeneurSeuls" 7
-		randomlyLocatedAloneEntities: BSPromeneurSeul.
+		entity: BSPromeneurSeul.
+		self thePromeneurSeuls do: [ :seul | seul home: self home ].
 		
 	self createN: 20 randomlyLocatedEntities: BSPhoque.
 ]
@@ -196,9 +211,13 @@ BSModel >> simpleEnvironment [
 	"(self theHabitatTypes at: 1) type: 'Home'."
 	self initializeHabitatTypeFromMatrix.
 	self initializeLegalStatusFromMatrix.
+	self home: (theHabitatTypes detect: [ :cell | cell type = 'Home' ]).
 
+	self initializeAgents.
+	self thePromeneurGuides do: [ :guide | guide moveTo: home ].
+	self thePromeneurSeuls do: [ :guide | guide moveTo: home ].
+	
 	self
-		initializeAgents;
 		displayPov: #povHabitatType of: BSHabitatCell;
 		displayPov: #defaultPOV of:  BSPromeneur;
 		displayPov: #defaultPOV of: BSPhoque.

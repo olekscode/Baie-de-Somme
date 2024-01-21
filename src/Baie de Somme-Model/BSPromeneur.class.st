@@ -4,6 +4,7 @@ Class {
 	#traits : 'TCMLocated',
 	#classTraits : 'TCMLocated classTrait',
 	#instVars : [
+		'home',
 		'satisfaction',
 		'energy'
 	],
@@ -22,12 +23,24 @@ BSPromeneur >> energy: anObject [
 	energy := anObject
 ]
 
+{ #category : #accessing }
+BSPromeneur >> home [
+
+	^ home
+]
+
+{ #category : #accessing }
+BSPromeneur >> home: anObject [
+
+	home := anObject
+]
+
 { #category : #initialization }
 BSPromeneur >> initialize [ 
 
 	super initialize.
 	satisfaction := 0.
-	energy := 10.
+	energy := 10. 
 ]
 
 { #category : #printing }
@@ -37,6 +50,12 @@ BSPromeneur >> interestingDetails [
 	^ super interestingDetails , { 
 		'Energy: ' -> (self energy asString)
 		}
+]
+
+{ #category : #'as yet unclassified' }
+BSPromeneur >> moveToASeal [
+
+	self randomWalk
 ]
 
 { #category : #pov }
@@ -73,6 +92,7 @@ BSPromeneur >> satisfaction: anObject [
 { #category : #stepping }
 BSPromeneur >> step [
 
+	self moveToASeal.
 	(energy = 0) ifTrue: [ self rentre ].
 
 
