@@ -5,10 +5,11 @@ Class {
 		'theHabitatTypes',
 		'thePromeneurGuides',
 		'thePromeneurSeuls',
-		'thePhoques',
+		'theSeals',
 		'numberOfRows',
 		'numberOfColumns',
-		'home'
+		'home',
+		'restingPlaces'
 	],
 	#category : #'Baie de Somme-Model'
 }
@@ -37,20 +38,68 @@ BSModel class >> initialNumberOfPromeneurSeuls [
 ]
 
 { #category : #'as yet unclassified' }
+BSModel >> accessRuleMatrix [
+
+	| matrix |
+	
+	matrix := #(
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 1 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)).
+		
+	(matrix size = numberOfRows and: [ matrix allSatisfy: [ :row | row size = numberOfColumns ] ])
+		ifFalse: [ self error: 'Matrix has the wrong dimensions' ].
+		
+	^ matrix
+]
+
+{ #category : #'as yet unclassified' }
 BSModel >> habitatTypeMatrix [
 
 	| matrix |
 	
 	matrix := #(
-		(1 1 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0)
-		(1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 2 1 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 1 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -61,16 +110,11 @@ BSModel >> habitatTypeMatrix [
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)).
 		
 	(matrix size = numberOfRows and: [ matrix allSatisfy: [ :row | row size = numberOfColumns ] ])
@@ -101,8 +145,21 @@ BSModel >> initialize [
 	
 	thePromeneurGuides := OrderedCollection new.
 	thePromeneurSeuls := OrderedCollection new.
-	thePhoques := OrderedCollection new.
+	theSeals := OrderedCollection new.
 	theHabitatTypes := OrderedCollection new.
+]
+
+{ #category : #initialization }
+BSModel >> initializeAccessRuleFromMatrix [
+
+	| matrixCellValue modelCell |
+	1 to: numberOfRows do: [ :i | 
+		1 to: numberOfColumns do: [ :j | 
+			matrixCellValue := (self accessRuleMatrix at: i) at: j.
+			modelCell := self pickCellAt: j @ i.
+			matrixCellValue = 0 ifTrue: [ modelCell accessRule:  'Forbidden' ].
+			matrixCellValue = 1 ifTrue: [ modelCell accessRule:  'Accessible' ].
+			] ]
 ]
 
 { #category : #'init entities' }
@@ -110,15 +167,15 @@ BSModel >> initializeAgents [
 
 	self
 		createN: "self class initialNumberOfPromeneurGuides" 5
-		entity: BSPromeneurGuide.
-		self thePromeneurGuides do: [ :guide | guide home: self home ].
+		entity: BSWalkerGuide.
+		self thePromeneurGuides do: [ :guide | self initializeWalkerGuide: guide ].
 		
 	self
 		createN: "self class initialNumberOfPromeneurSeuls" 7
-		entity: BSPromeneurSeul.
+		entity: BSWalkerAlone.
 		self thePromeneurSeuls do: [ :seul | seul home: self home ].
 		
-	self createN: 20 randomlyLocatedEntities: BSPhoque.
+	self createN: 50 randomlyLocatedEntities: BSSeal constrainedBy: [:c | c type = 'Sea' ].
 ]
 
 { #category : #initialization }
@@ -136,30 +193,63 @@ BSModel >> initializeHabitatTypeFromMatrix [
 ]
 
 { #category : #initialization }
-BSModel >> initializeLegalStatusFromMatrix [
+BSModel >> initializeSealRestingPlacesFromMatrix [
 
 	| matrixCellValue modelCell |
 	1 to: numberOfRows do: [ :i | 
 		1 to: numberOfColumns do: [ :j | 
-			matrixCellValue := (self legalStatusMatrix at: i) at: j.
+			matrixCellValue := (self sealRestingPlaceMatrix at: i) at: j.
 			modelCell := self pickCellAt: j @ i.
-			matrixCellValue = 0 ifTrue: [ modelCell legalStatus:  'Public' ].
-			matrixCellValue = 1 ifTrue: [ modelCell legalStatus:  'Private' ].
+			matrixCellValue = 0 ifTrue: [ modelCell sealRestingPlace:  'Not' ].
+			matrixCellValue = 1 ifTrue: [ modelCell sealRestingPlace:  'R1' ].
+			matrixCellValue = 2 ifTrue: [ modelCell sealRestingPlace:  'R2' ].
+			matrixCellValue = 3 ifTrue: [ modelCell sealRestingPlace:  'R3' ].
+			matrixCellValue = 4 ifTrue: [ modelCell sealRestingPlace:  'O1' ].
+			matrixCellValue = 5 ifTrue: [ modelCell sealRestingPlace:  'O2' ].
+			matrixCellValue = 6 ifTrue: [ modelCell sealRestingPlace:  'O3' ].
 			] ]
 ]
 
+{ #category : #'init entities' }
+BSModel >> initializeWalkerGuide: guide [
+
+|arg|
+
+	guide home: self home.
+	
+	arg:= Cormas random.
+	
+	(arg < 0.33) ifTrue: [ ^ guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O1' ]) first ].
+	(arg > 0.66) ifTrue: [ ^ guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O2' ]) first ].
+	guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O3' ]) first.
+
+]
+
+{ #category : #probes }
+BSModel >> numberOfPromeneurGuides [
+
+	<probe>
+	^ self thePromeneurGuides size
+]
+
+{ #category : #accessing }
+BSModel >> restingPlaces [
+
+	^ restingPlaces
+]
+
+{ #category : #accessing }
+BSModel >> restingPlaces: anObject [
+
+	restingPlaces := anObject
+]
+
 { #category : #'as yet unclassified' }
-BSModel >> legalStatusMatrix [
+BSModel >> sealRestingPlaceMatrix [
 
 	| matrix |
 	
 	matrix := #(
-		(1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -167,7 +257,13 @@ BSModel >> legalStatusMatrix [
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 6 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 0 5 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 3 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 3 3 0 0)
+		(0 0 0 0 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 0 0)
+		(0 0 0 0 2 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 0 0)
+		(0 0 0 0 0 0 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -191,13 +287,6 @@ BSModel >> legalStatusMatrix [
 	^ matrix
 ]
 
-{ #category : #probes }
-BSModel >> numberOfPromeneurGuides [
-
-	<probe>
-	^ self thePromeneurGuides size
-]
-
 { #category : #init }
 BSModel >> simpleEnvironment [
 
@@ -205,28 +294,32 @@ BSModel >> simpleEnvironment [
 		createGridLines: numberOfRows
 		columns: numberOfColumns
 		neighbourhood: 8
-		closed: false.
+		closed: true.
 
 	"self theHabitatTypes do: [ :each | each initializeWithRandomHabitat ]."
 	"(self theHabitatTypes at: 1) type: 'Home'."
 	self initializeHabitatTypeFromMatrix.
-	self initializeLegalStatusFromMatrix.
+	self initializeAccessRuleFromMatrix.
+	self initializeSealRestingPlacesFromMatrix.
 	self home: (theHabitatTypes detect: [ :cell | cell type = 'Home' ]).
+	self restingPlaces: #('R1' 'R2' 'R3').
 
 	self initializeAgents.
 	self thePromeneurGuides do: [ :guide | guide moveTo: home ].
 	self thePromeneurSeuls do: [ :guide | guide moveTo: home ].
+	self theSeals do: [ :seal | (Cormas random < 0.5) ifTrue: [ seal randomJumpConstrainedBy: [ :cell | cell sealRestingPlace = seal restingPlace ] ] ].
 	
 	self
 		displayPov: #povHabitatType of: BSHabitatCell;
-		displayPov: #defaultPOV of:  BSPromeneur;
-		displayPov: #defaultPOV of: BSPhoque.
+		displayPov: #defaultPOV of:  BSWalker;
+		displayPov: #defaultPOV of: BSSeal.
 ]
 
 { #category : #control }
 BSModel >> step: anObject [
 
-	self askRandom: BSPromeneur toDo: #step 
+	self askRandom: BSWalker toDo: #step.
+	"self askRandom: BSSeal toDo: #step."
 ]
 
 { #category : #accessing }
@@ -243,20 +336,8 @@ BSModel >> theHabitatTypes: anObject [
 ]
 
 { #category : #accessing }
-BSModel >> thePhoques [
-<getterFor: #BSPhoque >
-	^ thePhoques
-]
-
-{ #category : #accessing }
-BSModel >> thePhoques: anObject [
-
-	thePhoques := anObject
-]
-
-{ #category : #accessing }
 BSModel >> thePromeneurGuides [
-	<getterFor: #BSPromeneurGuide>	
+	<getterFor: #BSWalkerGuide>	
 
 	^ thePromeneurGuides
 ]
@@ -269,7 +350,7 @@ BSModel >> thePromeneurGuides: anObject [
 
 { #category : #accessing }
 BSModel >> thePromeneurSeuls [
-	<getterFor: #BSPromeneurSeul>
+	<getterFor: #BSWalkerAlone>
 
 	^ thePromeneurSeuls
 ]
@@ -278,6 +359,18 @@ BSModel >> thePromeneurSeuls [
 BSModel >> thePromeneurSeuls: anObject [
 
 	thePromeneurSeuls := anObject
+]
+
+{ #category : #accessing }
+BSModel >> theSeals [
+<getterFor: #BSSeal >
+	^ theSeals
+]
+
+{ #category : #accessing }
+BSModel >> theSeals: anObject [
+
+	theSeals := anObject
 ]
 
 { #category : #probes }

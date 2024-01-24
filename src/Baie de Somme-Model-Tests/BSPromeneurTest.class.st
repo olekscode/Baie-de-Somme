@@ -12,8 +12,8 @@ Class {
 BSPromeneurTest >> setUp [
 
 	super setUp.
-	promeneurGuide := BSPromeneurGuide  new.
-	promeneurSeul := BSPromeneurSeul new.
+	promeneurGuide := BSWalkerGuide  new.
+	promeneurSeul := BSWalkerAlone new.
 	
 ]
 
