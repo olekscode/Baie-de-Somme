@@ -173,7 +173,7 @@ BSModel >> initializeAgents [
 	self
 		createN: "self class initialNumberOfPromeneurSeuls" 7
 		entity: BSWalkerAlone.
-		self thePromeneurSeuls do: [ :seul | seul home: self home ].
+		self thePromeneurSeuls do: [ :alone | self initializeWalkerAlone: alone ].
 		
 	self createN: 50 randomlyLocatedEntities: BSSeal constrainedBy: [:c | c type = 'Sea' ].
 ]
@@ -211,6 +211,36 @@ BSModel >> initializeSealRestingPlacesFromMatrix [
 ]
 
 { #category : #'init entities' }
+BSModel >> initializeWalkerAlone: walker [
+
+|potentialDestination arg|
+
+	walker home: self home.
+	
+	potentialDestination := theHabitatTypes select: [ :cell | cell type = 'Sea' ].
+	
+	walker walkerDestination:  potentialDestination atRandom.
+	
+	arg:= Cormas random.
+	(arg < 0.05) 
+		ifTrue: [ walker withDog: 'leashed'] 
+		ifFalse: [ (arg < 0.35) 
+				ifTrue: [ walker withDog: 'unleashed' ]
+				ifFalse: [ walker withDog: 'no' ] 
+				].
+			
+	arg:= Cormas random.
+	(arg < 0.2) 
+		ifTrue: [ walker withBinoculars: 'yes'] 
+		ifFalse: [ walker withBinoculars: 'no'].
+		
+	arg:= Cormas random.
+	(arg < 0.2) 
+		ifTrue: [ walker sealAwareness: 'yes'] 
+		ifFalse: [ walker sealAwareness: 'no'].
+]
+
+{ #category : #'init entities' }
 BSModel >> initializeWalkerGuide: guide [
 
 |arg|
@@ -222,6 +252,11 @@ BSModel >> initializeWalkerGuide: guide [
 	(arg < 0.33) ifTrue: [ ^ guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O1' ]) first ].
 	(arg > 0.66) ifTrue: [ ^ guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O2' ]) first ].
 	guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O3' ]) first.
+
+	arg:= Cormas random.
+	(arg < 0.5) 
+		ifTrue: [ guide sealAwareness: 'yes'] 
+		ifFalse: [ guide sealAwareness: 'no'].
 
 ]
 
@@ -319,7 +354,8 @@ BSModel >> simpleEnvironment [
 BSModel >> step: anObject [
 
 	self askRandom: BSWalker toDo: #step.
-	"self askRandom: BSSeal toDo: #step."
+	self askRandom: BSHabitatCell toDo: #step.
+	self askRandom: BSSeal toDo: #step.
 ]
 
 { #category : #accessing }

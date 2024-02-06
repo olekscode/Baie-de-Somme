@@ -13,6 +13,33 @@ BSWalkerAlone class >> entityName [
 { #category : #behavior }
 BSWalkerAlone >> defineVision [
 
+(self withBinoculars = 'yes')
+	ifTrue: [ self defineVisionWihtBinolucars ]
+	ifFalse: [ self defineVisionWihtoutBinolucars ]
+]
+
+{ #category : #behavior }
+BSWalkerAlone >> defineVisionWihtBinolucars [
+
+|scope1 scope2|
+	scope1 := OrderedCollection new.
+	scope2 := OrderedCollection new.
+	scope1 := patch neighbourhoodAndSelf.
+	scope2 := scope1.
+	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
+	scope2 removeDuplicates.
+	scope1 := scope2.
+	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
+	scope2 removeDuplicates.
+	scope1 := scope2.
+	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
+	scope2 removeDuplicates.
+	self sight: scope2.
+]
+
+{ #category : #behavior }
+BSWalkerAlone >> defineVisionWihtoutBinolucars [
+
 |scope1 scope2|
 	scope1 := OrderedCollection new.
 	scope2 := OrderedCollection new.
@@ -42,9 +69,27 @@ BSWalkerAlone >> initialize [
 ]
 
 { #category : #behavior }
+BSWalkerAlone >> moveAlongBeach [
+	
+	|dest potentialDest|
+(self patch neighbourhood size < 8) ifTrue: [ ^ self uTurn ].
+
+potentialDest := self patch neighbourhood select: [ :cell | cell neighbourhoodAndSelf allSatisfy: [ :y | y ~= self previousCell ]].
+
+dest := potentialDest select: [ :cell | (cell type = 'Land') & (cell neighbourhood anySatisfy: [:y | y type = 'Sea'])].
+(dest isEmpty) ifTrue: [ (Cormas random < 0.5) ifTrue: [dest:= self patch neighbourE]  ifFalse: [dest:= self patch neighbourW]] ifFalse: [ dest := dest first ].
+self previousCell: self patch.
+self moveTo: dest.
+]
+
+{ #category : #behavior }
 BSWalkerAlone >> moveToASeal [
 
-	self randomWalkConstrainedBy: [ :cell | cell type = 'Land' ].
+	(self patch neighbourhood select: [ :each | each type = 'Sea' ]) isEmpty
+		ifFalse: [ ^ self moveAlongBeach ]
+		ifTrue: [ ^ self previousCell: self patch; moveTowards: self walkerDestination ]
+		
+	
 ]
 
 { #category : #pov }
@@ -71,4 +116,13 @@ BSWalkerAlone >> povSatisfaction [
 		  min: 0
 		  max: 180
 		  color: Color red 
+]
+
+{ #category : #behavior }
+BSWalkerAlone >> uTurn [
+
+|dest|
+dest:= self previousCell.
+self previousCell: self patch;
+moveTo: dest.
 ]

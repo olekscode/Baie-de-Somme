@@ -51,7 +51,10 @@ BSWalkerGuide >> initialize [
 { #category : #behavior }
 BSWalkerGuide >> moveToASeal [
 
-	self moveTowards: self walkerDestination.
+self moveTowards: (self walkerDestination) constraintOnPath: [:cell | cell type = 'Land' ].
+	
+
+
 ]
 
 { #category : #pov }

@@ -11,7 +11,11 @@ Class {
 		'sealExpectation',
 		'groupSize',
 		'siteWithSeal',
-		'walkerDestination'
+		'walkerDestination',
+		'previousCell',
+		'sealAwareness',
+		'withDog',
+		'withBinoculars'
 	],
 	#category : #'Baie de Somme-Model'
 }
@@ -85,27 +89,45 @@ BSWalker >> interestingDetails [
 { #category : #behavior }
 BSWalker >> lookAtSeals [
 
-|distance1 distance2 numberOfWalkers|
-distance1 := SortedCollection new.
-numberOfWalkers := 0.
+(self sealAwareness = 'yes')
+	ifTrue: [ ^ self lookAtSealsAware ]
+	ifFalse: [ ^ self lookAtSealsNotAware ]
+]
 
-self siteWithSeal do: [ :cell | distance1 add: (cell distanceTo: self patch) ].
-	distance2 := distance1 first.
+{ #category : #behavior }
+BSWalker >> lookAtSealsAware [
+
+| numberOfWalkers|
+numberOfWalkers := 0.
 	
+self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + walker groupSize ].
 	
-	(distance2 > sealExpectation) ifTrue: [ ^ self moveTowards: siteWithSeal ].
+(numberOfWalkers < (self groupSize + 1)) 
+	ifTrue: [ satisfaction := satisfaction + 2 ]
+	ifFalse: [ satisfaction := satisfaction + 1 ].
+]
+
+{ #category : #behavior }
+BSWalker >> lookAtSealsNotAware [
+
+| numberOfWalkers|
+numberOfWalkers := 0.
 	
-	(self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + walker groupSize ]).
+self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + walker groupSize ].
 	
-	(numberOfWalkers < (self groupSize + 1)) ifTrue: [ satisfaction := satisfaction + 2 ].
+(numberOfWalkers < (self groupSize + 1)) 
+	ifTrue: [ satisfaction := satisfaction + 2 ]
+	ifFalse: [ satisfaction := satisfaction + 1 ].
+self moveToASeal.
 ]
 
 { #category : #behavior }
 BSWalker >> lookForSeals [
 
-siteWithSeal := self sight select: [ :cell | cell hasOccupantsOfClass: BSSeal ].
+siteWithSeal := self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell type = 'Land') ].
 	
-	
+(self siteWithSeal isEmpty)
+	ifFalse: [ walkerDestination := siteWithSeal atRandom ].
 	
 ]
 
@@ -122,6 +144,18 @@ BSWalker >> pov [
 ]
 
 { #category : #accessing }
+BSWalker >> previousCell [
+
+	^ previousCell
+]
+
+{ #category : #accessing }
+BSWalker >> previousCell: anObject [
+
+	previousCell := anObject
+]
+
+{ #category : #accessing }
 BSWalker >> satisfaction [
 
 	^ satisfaction
@@ -131,6 +165,18 @@ BSWalker >> satisfaction [
 BSWalker >> satisfaction: anObject [
 
 	satisfaction := anObject
+]
+
+{ #category : #accessing }
+BSWalker >> sealAwareness [
+
+	^ sealAwareness
+]
+
+{ #category : #accessing }
+BSWalker >> sealAwareness: anObject [
+
+	sealAwareness := anObject
 ]
 
 { #category : #accessing }
@@ -173,12 +219,15 @@ BSWalker >> siteWithSeal: anObject [
 BSWalker >> step [
 
 	self defineVision.
+	
 	(energy = 0) ifTrue: [ ^ self goBackHome ].
+	
 	self lookForSeals.
-	(self siteWithSeal size > 0) 
-		ifTrue: [ self lookAtSeals ]
-		ifFalse: [ self moveToASeal ].
-		
+	
+	(self siteWithSeal isEmpty) ifTrue: [ ^ self moveToASeal ].
+	
+	self lookAtSeals.
+	
 	energy := energy - 1.
 	
 
@@ -195,4 +244,28 @@ BSWalker >> walkerDestination [
 BSWalker >> walkerDestination: anObject [
 
 	walkerDestination := anObject
+]
+
+{ #category : #accessing }
+BSWalker >> withBinoculars [
+
+	^ withBinoculars
+]
+
+{ #category : #accessing }
+BSWalker >> withBinoculars: anObject [
+
+	withBinoculars := anObject
+]
+
+{ #category : #accessing }
+BSWalker >> withDog [
+
+	^ withDog
+]
+
+{ #category : #accessing }
+BSWalker >> withDog: anObject [
+
+	withDog := anObject
 ]
