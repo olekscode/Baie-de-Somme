@@ -117,9 +117,7 @@ BSHabitatCell >> povRestingPlace [
 	self sealRestingPlace  = 'R1' ifTrue: [ ^ Color green ].
 	self sealRestingPlace  = 'R2' ifTrue: [ ^ Color green ].
 	self sealRestingPlace  = 'R3' ifTrue: [ ^ Color green ].
-	self sealRestingPlace  = 'O1' ifTrue: [ ^ Color yellow ].
-	self sealRestingPlace  = 'O2' ifTrue: [ ^ Color yellow ].
-	self sealRestingPlace  = 'O3' ifTrue: [ ^ Color yellow ].
+	self sealRestingPlace  = 'Observatory' ifTrue: [ ^ Color yellow ].
 	self sealRestingPlace  = 'Not' ifTrue: [ ^ Color black ].
 ]
 

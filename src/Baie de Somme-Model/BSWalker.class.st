@@ -41,7 +41,7 @@ BSWalker >> energy: anObject [
 { #category : #behavior }
 BSWalker >> goBackHome [
 	
-	self moveTowards: home "constraintOnPath: [ :cell | cell type ~= 'Land' ]".
+	self moveTowards: home constraintOnPath: [ :cell | (cell type = 'Land') or: [cell type = 'Home']].
 	
 ]
 
@@ -74,7 +74,8 @@ BSWalker >> initialize [
 
 	super initialize.
 	satisfaction := 0.
-	energy := (Cormas random * 100) rounded. 
+	energy := (Cormas random * 100) rounded.
+	siteWithSeal := OrderedCollection new. 
 ]
 
 { #category : #printing }
@@ -126,15 +127,12 @@ BSWalker >> lookForSeals [
 
 siteWithSeal := self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell type = 'Land') ].
 	
-(self siteWithSeal isEmpty)
-	ifFalse: [ walkerDestination := siteWithSeal atRandom ].
-	
 ]
 
 { #category : #behavior }
 BSWalker >> moveToASeal [
 
-	self randomWalkConstrainedBy: [ :cell | cell type = 'Land' ].
+	
 ]
 
 { #category : #pov }
@@ -191,6 +189,40 @@ BSWalker >> sealExpectation: anObject [
 	sealExpectation := anObject
 ]
 
+{ #category : #behavior }
+BSWalker >> setDestination [
+
+(self siteWithSeal isNotEmpty)
+	ifTrue: [ self setDestinationToSeal ]
+	ifFalse: [ self setDestinationToOther ]
+	
+]
+
+{ #category : #behavior }
+BSWalker >> setDestinationToOther [
+
+
+]
+
+{ #category : #behavior }
+BSWalker >> setDestinationToSeal [
+
+| potentialDestination distanceToSeal|
+distanceToSeal := 0.
+
+potentialDestination := siteWithSeal select: [ :site | (self patch wayTo: site constraint: [ :cell | cell type = 'Land' ]) isNotEmpty ].
+
+(potentialDestination isNotEmpty) ifTrue: [ ^ self walkerDestination: potentialDestination atRandom ].
+
+self siteWithSeal do: [ :cell | potentialDestination addAll: (self patch wayTo: cell)].
+self siteWithSeal do: [ :cell | potentialDestination remove: cell ].
+potentialDestination := potentialDestination removeDuplicates.
+"potentialDestination := potentialDestination remove: [ :x | x = self patch ]."
+potentialDestination := potentialDestination select: [ :cell | cell type = 'Land' ].
+(potentialDestination isEmpty) ifTrue: [ ^ self walkerDestination: self patch ].
+potentialDestination do: [ :dest |  ((self patch distanceTo: dest) >= distanceToSeal) ifTrue: [ self walkerDestination: dest. distanceToSeal := self patch distanceTo: dest ]].
+]
+
 { #category : #accessing }
 BSWalker >> sight [
 
@@ -222,7 +254,7 @@ BSWalker >> step [
 	
 	(energy = 0) ifTrue: [ ^ self goBackHome ].
 	
-	self lookForSeals.
+	self setDestination.
 	
 	(self siteWithSeal isEmpty) ifTrue: [ ^ self moveToASeal ].
 	

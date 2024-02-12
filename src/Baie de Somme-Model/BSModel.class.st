@@ -96,8 +96,8 @@ BSModel >> habitatTypeMatrix [
 		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 1 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 1 1 0 0)
-		(0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 1 1 0 0)
+		(0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1 0 0)
 		(0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
 		(0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -166,12 +166,12 @@ BSModel >> initializeAccessRuleFromMatrix [
 BSModel >> initializeAgents [ 
 
 	self
-		createN: "self class initialNumberOfPromeneurGuides" 5
+		createN: "self class initialNumberOfPromeneurGuides" 1
 		entity: BSWalkerGuide.
 		self thePromeneurGuides do: [ :guide | self initializeWalkerGuide: guide ].
 		
 	self
-		createN: "self class initialNumberOfPromeneurSeuls" 7
+		createN: "self class initialNumberOfPromeneurSeuls" 0
 		entity: BSWalkerAlone.
 		self thePromeneurSeuls do: [ :alone | self initializeWalkerAlone: alone ].
 		
@@ -204,9 +204,7 @@ BSModel >> initializeSealRestingPlacesFromMatrix [
 			matrixCellValue = 1 ifTrue: [ modelCell sealRestingPlace:  'R1' ].
 			matrixCellValue = 2 ifTrue: [ modelCell sealRestingPlace:  'R2' ].
 			matrixCellValue = 3 ifTrue: [ modelCell sealRestingPlace:  'R3' ].
-			matrixCellValue = 4 ifTrue: [ modelCell sealRestingPlace:  'O1' ].
-			matrixCellValue = 5 ifTrue: [ modelCell sealRestingPlace:  'O2' ].
-			matrixCellValue = 6 ifTrue: [ modelCell sealRestingPlace:  'O3' ].
+			matrixCellValue = 4 ifTrue: [ modelCell sealRestingPlace:  'Observatory' ].
 			] ]
 ]
 
@@ -246,12 +244,8 @@ BSModel >> initializeWalkerGuide: guide [
 |arg|
 
 	guide home: self home.
-	
-	arg:= Cormas random.
-	
-	(arg < 0.33) ifTrue: [ ^ guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O1' ]) first ].
-	(arg > 0.66) ifTrue: [ ^ guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O2' ]) first ].
-	guide walkerDestination: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'O3' ]) first.
+	guide observatoryMemory: (theHabitatTypes select: [ :cell | cell sealRestingPlace = 'Observatory']).
+	guide walkerDestination: guide observatoryMemory atRandom. 
 
 	arg:= Cormas random.
 	(arg < 0.5) 
@@ -292,11 +286,11 @@ BSModel >> sealRestingPlaceMatrix [
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 6 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 0 5 0 0 0)
+		(0 0 0 0 0 4 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 0 4 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 3 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 3 3 0 0)
-		(0 0 0 0 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 3 3 0 0)
+		(0 0 0 0 2 2 2 2 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 3 3 0 0)
 		(0 0 0 0 2 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 0 0)
 		(0 0 0 0 0 0 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
