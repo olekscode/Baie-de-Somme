@@ -21,6 +21,12 @@ Class {
 }
 
 { #category : #behavior }
+BSWalker >> checkPosition [
+
+	self subclassResponsibility
+]
+
+{ #category : #behavior }
 BSWalker >> defineVision [
 
 	self subclassResponsibility
@@ -106,6 +112,7 @@ self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + wal
 (numberOfWalkers < (self groupSize + 1)) 
 	ifTrue: [ satisfaction := satisfaction + 2 ]
 	ifFalse: [ satisfaction := satisfaction + 1 ].
+	self walkerDestination: self patch.
 ]
 
 { #category : #behavior }
@@ -117,9 +124,9 @@ numberOfWalkers := 0.
 self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + walker groupSize ].
 	
 (numberOfWalkers < (self groupSize + 1)) 
-	ifTrue: [ satisfaction := satisfaction + 2 ]
-	ifFalse: [ satisfaction := satisfaction + 1 ].
-self moveToASeal.
+	ifTrue: [ satisfaction := satisfaction + 1 ]
+	"ifFalse: [ satisfaction := satisfaction + 1 ]".
+self setDestinationToSeal.
 ]
 
 { #category : #behavior }
@@ -129,10 +136,39 @@ siteWithSeal := self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) 
 	
 ]
 
+{ #category : #'as yet unclassified' }
+BSWalker >> lookForSpot [
+]
+
+{ #category : #moving }
+BSWalker >> moveInDirectionOf: aCell constraintOnPath: aBlock [
+	"Purpose: moves one cell in direction of a given location, taking a specified constraint on each cell of the path to destination.
+Argument: aCell = <SpatialEntityElement>
+Example: self moveTowards: self house patch constraintOnPath: [:c | c isClosed not]"
+
+	| path candidate dist|
+	dist:=3.
+	
+	self isSituated ifTrue: [
+		self patch = aCell ifFalse: [
+			path := self patch wayTo: aCell.
+			"path remove: self patch."
+			
+			path do: [ :cell | (self patch distanceTo: cell) < dist ifTrue: 
+				[ candidate := cell asOrderedCollection. dist := self patch distanceTo: cell ] ].
+			
+			candidate:= candidate select: [ :c | aBlock value: c ].
+			candidate isNotEmpty ifTrue: [ self moveTo: candidate atRandom ]] ]
+]
+
 { #category : #behavior }
 BSWalker >> moveToASeal [
 
 	
+]
+
+{ #category : #behavior }
+BSWalker >> moveToDestination [
 ]
 
 { #category : #pov }
@@ -189,38 +225,29 @@ BSWalker >> sealExpectation: anObject [
 	sealExpectation := anObject
 ]
 
-{ #category : #behavior }
-BSWalker >> setDestination [
+{ #category : #'as yet unclassified' }
+BSWalker >> selectFarthestLandOnWayToSeaFrom: position to: potentialDestination [
 
-(self siteWithSeal isNotEmpty)
-	ifTrue: [ self setDestinationToSeal ]
-	ifFalse: [ self setDestinationToOther ]
-	
-]
+| distanceToSpot temporaryDestination finalDestination|
+temporaryDestination:= OrderedCollection new.
+distanceToSpot := 0.
 
-{ #category : #behavior }
-BSWalker >> setDestinationToOther [
+temporaryDestination := potentialDestination select: [ :site | (position wayTo: site constraint: [ :cell | cell type = 'Land' ]) isNotEmpty].
+(temporaryDestination isNotEmpty) ifTrue: [ finalDestination := potentialDestination atRandom. ^finalDestination ].
 
-
+potentialDestination do: [ :cell | temporaryDestination addAll: (position wayTo: cell)].
+temporaryDestination := temporaryDestination select: [ :site | (position wayTo: site constraint: [ :cell | cell type = 'Land' ]) isNotEmpty ].
+temporaryDestination := temporaryDestination removeDuplicates.
+temporaryDestination := temporaryDestination select: [ :cell | cell type = 'Land' ].
+"(temporaryDestination isEmpty) ifTrue: [ self walkerDestination: self patch ]."
+temporaryDestination do: [ :dest |  ((position distanceTo: dest) >= distanceToSpot) ifTrue: [ finalDestination := dest. distanceToSpot := position distanceTo: dest ]].
+^finalDestination 
 ]
 
 { #category : #behavior }
 BSWalker >> setDestinationToSeal [
 
-| potentialDestination distanceToSeal|
-distanceToSeal := 0.
-
-potentialDestination := siteWithSeal select: [ :site | (self patch wayTo: site constraint: [ :cell | cell type = 'Land' ]) isNotEmpty ].
-
-(potentialDestination isNotEmpty) ifTrue: [ ^ self walkerDestination: potentialDestination atRandom ].
-
-self siteWithSeal do: [ :cell | potentialDestination addAll: (self patch wayTo: cell)].
-self siteWithSeal do: [ :cell | potentialDestination remove: cell ].
-potentialDestination := potentialDestination removeDuplicates.
-"potentialDestination := potentialDestination remove: [ :x | x = self patch ]."
-potentialDestination := potentialDestination select: [ :cell | cell type = 'Land' ].
-(potentialDestination isEmpty) ifTrue: [ ^ self walkerDestination: self patch ].
-potentialDestination do: [ :dest |  ((self patch distanceTo: dest) >= distanceToSeal) ifTrue: [ self walkerDestination: dest. distanceToSeal := self patch distanceTo: dest ]].
+self walkerDestination: self siteWithSeal atRandom.
 ]
 
 { #category : #accessing }
@@ -250,17 +277,15 @@ BSWalker >> siteWithSeal: anObject [
 { #category : #stepping }
 BSWalker >> step [
 
+	self checkPosition.
 	self defineVision.
-	
 	(energy = 0) ifTrue: [ ^ self goBackHome ].
-	
-	self setDestination.
-	
-	(self siteWithSeal isEmpty) ifTrue: [ ^ self moveToASeal ].
-	
-	self lookAtSeals.
-	
-	energy := energy - 1.
+	self lookForSeals.
+	(self siteWithSeal isNotEmpty) 
+	ifTrue: [ self lookAtSeals ]
+	ifFalse: [ self lookForSpot ].
+	self moveToDestination.
+	self siteWithSeal removeAll.
 	
 
 

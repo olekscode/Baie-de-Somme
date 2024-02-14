@@ -13,6 +13,16 @@ BSWalkerGuide class >> entityName [
 	^ 'PromeneurGuide'
 ]
 
+{ #category : #behavior }
+BSWalkerGuide >> checkPosition [
+
+(self patch sealRestingPlace = 'Observatory')
+	ifTrue: [ ((self observatoryMemory select: [:x|x = self patch]) isNotEmpty)
+		ifTrue: [  
+			self observatoryMemory remove: self patch].
+	].
+]
+
 { #category : #'as yet unclassified' }
 BSWalkerGuide >> defineVision [
 
@@ -52,6 +62,24 @@ BSWalkerGuide >> initialize [
 ]
 
 { #category : #behavior }
+BSWalkerGuide >> lookForSpot [
+
+| distanceToObservatory potentialDestination|
+
+	((self walkerDestination sealRestingPlace = 'Observatory') & (observatoryMemory contains: [ :x | x = self walkerDestination])) ifTrue: [ ^ self ].
+
+	potentialDestination := Dictionary new.
+	distanceToObservatory := OrderedCollection new.
+
+	self observatoryMemory isEmpty ifTrue: [ self energy: 0. ^ self walkerDestination: self home ].
+	self observatoryMemory do: [ :cell | potentialDestination at: (self patch distanceTo: cell constraintOnPath: [ :x | x type = 'Land']) put: cell ].
+	"distanceToObservatory isEmpty ifTrue: [ ^ self moveAlongBeach ]."
+	potentialDestination keysDo: [ :x | distanceToObservatory add: x].
+	distanceToObservatory := distanceToObservatory asSortedCollection: [ :x :y | x < y ].
+	self walkerDestination: (potentialDestination at: (distanceToObservatory first)).
+]
+
+{ #category : #behavior }
 BSWalkerGuide >> moveAlongBeach [
 	
 	|dest potentialDest|
@@ -71,6 +99,17 @@ BSWalkerGuide >> moveToASeal [
 self moveTowards: (self walkerDestination) constraintOnPath: [:cell | (cell type = 'Land') or: [ cell type = 'Home' ] ].
 	
 
+
+]
+
+{ #category : #behavior }
+BSWalkerGuide >> moveToDestination [
+
+(self walkerDestination sealRestingPlace = 'Observatory')
+ifTrue: [ self moveTowards: walkerDestination constraintOnPath: [:cell | cell type = 'Land' or: [ cell type = 'Home' ] ] ]
+ifFalse: [ self moveInDirectionOf: walkerDestination constraintOnPath: [:cell | cell type = 'Land' or: [ cell type = 'Home' ] ]].
+
+energy := energy - 1.
 
 ]
 
@@ -110,38 +149,6 @@ BSWalkerGuide >> povSatisfaction [
 		  min: 0
 		  max: 180
 		  color: Color blue 
-]
-
-{ #category : #behavior }
-BSWalkerGuide >> setDestination [
-
-(self patch sealRestingPlace = 'Observatory' and: [self patch = walkerDestination ])
-	ifTrue: [ ((self observatoryMemory select: [:x|x = self patch]) isNotEmpty)
-		ifTrue: [  
-			self observatoryMemory remove: self walkerDestination].
-		self walkerDestination: 0. 
-		self lookForSeals
-	].
-(self walkerDestination ~= 0) ifTrue: [ ^ self ].
-	
-(self siteWithSeal isNotEmpty)
-	ifTrue: [ self setDestinationToSeal ]
-	ifFalse: [ self setDestinationToOther ]
-]
-
-{ #category : #behavior }
-BSWalkerGuide >> setDestinationToOther [
-
-	| distanceToObservatory potentialDestination|
-	potentialDestination := Dictionary new.
-	distanceToObservatory := OrderedCollection new.
-	self halt.
-	self observatoryMemory isEmpty ifTrue: [ ^ self energy: 0 ].
-	self observatoryMemory do: [ :cell | potentialDestination at: (self patch distanceTo: cell constraintOnPath: [ :x | x type = 'Land']) put: cell ].
-	"distanceToObservatory isEmpty ifTrue: [ ^ self moveAlongBeach ]."
-	potentialDestination keysDo: [ :x | distanceToObservatory add: x].
-	distanceToObservatory := distanceToObservatory asSortedCollection: [ :x :y | x < y ].
-	self walkerDestination: (potentialDestination keyAtValue: (distanceToObservatory first)).
 ]
 
 { #category : #behavior }

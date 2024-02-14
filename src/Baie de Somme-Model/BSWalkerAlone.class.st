@@ -1,6 +1,9 @@
 Class {
 	#name : #BSWalkerAlone,
 	#superclass : #BSWalker,
+	#instVars : [
+		'destinationMemory'
+	],
 	#category : #'Baie de Somme-Model'
 }
 
@@ -8,6 +11,13 @@ Class {
 BSWalkerAlone class >> entityName [
 
 	^ 'PromeneurSeul'
+]
+
+{ #category : #behavior }
+BSWalkerAlone >> checkPosition [
+
+(self patch neighbourhood select: [ :each | each type = 'Sea' ]) isEmpty
+		ifFalse: [ ^ self destinationMemory removeAll ]
 ]
 
 { #category : #behavior }
@@ -50,6 +60,18 @@ BSWalkerAlone >> defineVisionWihtoutBinolucars [
 	self sight: scope2.
 ]
 
+{ #category : #accessing }
+BSWalkerAlone >> destinationMemory [
+
+	^ destinationMemory
+]
+
+{ #category : #accessing }
+BSWalkerAlone >> destinationMemory: anObject [
+
+	destinationMemory := anObject
+]
+
 { #category : #initialization }
 BSWalkerAlone >> initialize [ 
 
@@ -69,17 +91,24 @@ BSWalkerAlone >> initialize [
 ]
 
 { #category : #behavior }
+BSWalkerAlone >> lookForSpot [
+
+self destinationMemory isNotEmpty
+ifTrue: [ ^ self walkerDestination: self destinationMemory atRandom ].
+
+self moveAlongBeach.
+]
+
+{ #category : #behavior }
 BSWalkerAlone >> moveAlongBeach [
 	
-	|dest potentialDest|
-(self patch neighbourhood size < 8) ifTrue: [ ^ self uTurn ].
+	|potentialDest|
+potentialDest := self patch neighbourhood select: [ :cell | cell ~= self previousCell ].
+potentialDest := potentialDest select: [ :cell | (cell type = 'Land') and: [ cell neighbourhood anySatisfy: [:y | y type = 'Sea'] ] ].
 
-potentialDest := self patch neighbourhood select: [ :cell | cell neighbourhoodAndSelf allSatisfy: [ :y | y ~= self previousCell ]].
+potentialDest isEmpty ifTrue: [ ^ self uTurn ].
 
-dest := potentialDest select: [ :cell | (cell type = 'Land') & (cell neighbourhood anySatisfy: [:y | y type = 'Sea'])].
-(dest isEmpty) ifTrue: [ (Cormas random < 0.5) ifTrue: [dest:= self patch neighbourE]  ifFalse: [dest:= self patch neighbourW]] ifFalse: [ dest := dest first ].
-self previousCell: self patch.
-self moveTo: dest.
+self walkerDestination: potentialDest atRandom.
 ]
 
 { #category : #behavior }
@@ -90,6 +119,13 @@ BSWalkerAlone >> moveToASeal [
 		ifTrue: [ ^ self previousCell: self patch; moveTowards: self walkerDestination ]
 		
 	
+]
+
+{ #category : #behavior }
+BSWalkerAlone >> moveToDestination [
+
+self previousCell: self patch.
+self moveInDirectionOf: walkerDestination constraintOnPath: [ :cell | cell type = 'Land' or: [ cell type = 'Home' ] ]
 ]
 
 { #category : #pov }
@@ -123,6 +159,5 @@ BSWalkerAlone >> uTurn [
 
 |dest|
 dest:= self previousCell.
-self previousCell: self patch;
-moveTo: dest.
+self walkerDestination: dest.
 ]

@@ -166,12 +166,12 @@ BSModel >> initializeAccessRuleFromMatrix [
 BSModel >> initializeAgents [ 
 
 	self
-		createN: "self class initialNumberOfPromeneurGuides" 1
+		createN: "self class initialNumberOfPromeneurGuides" 0
 		entity: BSWalkerGuide.
 		self thePromeneurGuides do: [ :guide | self initializeWalkerGuide: guide ].
 		
 	self
-		createN: "self class initialNumberOfPromeneurSeuls" 0
+		createN: "self class initialNumberOfPromeneurSeuls" 5
 		entity: BSWalkerAlone.
 		self thePromeneurSeuls do: [ :alone | self initializeWalkerAlone: alone ].
 		
@@ -218,6 +218,7 @@ BSModel >> initializeWalkerAlone: walker [
 	potentialDestination := theHabitatTypes select: [ :cell | cell type = 'Sea' ].
 	
 	walker walkerDestination:  potentialDestination atRandom.
+	walker destinationMemory: walker walkerDestination neighbourhoodAndSelf.
 	
 	arg:= Cormas random.
 	(arg < 0.05) 
