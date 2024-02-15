@@ -6,6 +6,7 @@ Class {
 		'thePromeneurGuides',
 		'thePromeneurSeuls',
 		'theSeals',
+		'theRestingPlaces',
 		'numberOfRows',
 		'numberOfColumns',
 		'home',
@@ -157,8 +158,8 @@ BSModel >> initializeAccessRuleFromMatrix [
 		1 to: numberOfColumns do: [ :j | 
 			matrixCellValue := (self accessRuleMatrix at: i) at: j.
 			modelCell := self pickCellAt: j @ i.
-			matrixCellValue = 0 ifTrue: [ modelCell accessRule:  'Forbidden' ].
-			matrixCellValue = 1 ifTrue: [ modelCell accessRule:  'Accessible' ].
+			matrixCellValue = 0 ifTrue: [ modelCell accessRule:  'By Sea' ].
+			matrixCellValue = 1 ifTrue: [ modelCell accessRule:  'By Land' ].
 			] ]
 ]
 
@@ -175,7 +176,11 @@ BSModel >> initializeAgents [
 		entity: BSWalkerAlone.
 		self thePromeneurSeuls do: [ :alone | self initializeWalkerAlone: alone ].
 		
-	self createN: 50 randomlyLocatedEntities: BSSeal constrainedBy: [:c | c type = 'Sea' ].
+	self 
+		createN: 50 randomlyLocatedEntities: BSSeal constrainedBy: [ :cell | cell type = 'Sea' ].
+		self theSeals do: [ :alone | self initializeSeals: alone ].
+	
+
 ]
 
 { #category : #initialization }
@@ -206,6 +211,26 @@ BSModel >> initializeSealRestingPlacesFromMatrix [
 			matrixCellValue = 3 ifTrue: [ modelCell sealRestingPlace:  'R3' ].
 			matrixCellValue = 4 ifTrue: [ modelCell sealRestingPlace:  'Observatory' ].
 			] ]
+]
+
+{ #category : #'init entities' }
+BSModel >> initializeSeals: seal [
+
+	| a sites|
+sites := OrderedCollection new.	
+a:= Cormas random.
+	(a< 0.33) 
+		ifTrue: [ seal restingPlace: 'R1' ]
+		ifFalse: [ 
+			(a > 0.66) 
+				ifTrue: [ seal restingPlace: 'R2' ]
+				ifFalse: [ seal restingPlace: 'R3'. ]
+		].
+
+seal restingPlaceMemory: theRestingPlaces.
+seal myRestingPlace: (theHabitatTypes select: [ :cell | cell sealRestingPlace = seal restingPlace ]).
+
+
 ]
 
 { #category : #'init entities' }
@@ -331,13 +356,14 @@ BSModel >> simpleEnvironment [
 	self initializeHabitatTypeFromMatrix.
 	self initializeAccessRuleFromMatrix.
 	self initializeSealRestingPlacesFromMatrix.
+	self theRestingPlaces: (theHabitatTypes select: [:cell | cell sealRestingPlace ~= 'Not' and: [cell sealRestingPlace ~= 'Observatory' ]]).
 	self home: (theHabitatTypes detect: [ :cell | cell type = 'Home' ]).
 	self restingPlaces: #('R1' 'R2' 'R3').
 
 	self initializeAgents.
 	self thePromeneurGuides do: [ :guide | guide moveTo: home ].
 	self thePromeneurSeuls do: [ :guide | guide moveTo: home ].
-	self theSeals do: [ :seal | (Cormas random < 0.5) ifTrue: [ seal randomJumpConstrainedBy: [ :cell | cell sealRestingPlace = seal restingPlace ] ] ].
+	self theSeals do: [ :seal | (Cormas random < 0.5) ifTrue: [ seal randomJumpConstrainedBy: [ :cell | cell sealRestingPlace = seal restingPlace. ] ] ].
 	
 	self
 		displayPov: #povHabitatType of: BSHabitatCell;
@@ -349,8 +375,9 @@ BSModel >> simpleEnvironment [
 BSModel >> step: anObject [
 
 	self askRandom: BSWalker toDo: #step.
-	self askRandom: BSHabitatCell toDo: #step.
+	"self askRandom: BSHabitatCell toDo: #step."
 	self askRandom: BSSeal toDo: #step.
+	self askRandom: BSSeal toDo: #stepAlert
 ]
 
 { #category : #accessing }
@@ -390,6 +417,18 @@ BSModel >> thePromeneurSeuls [
 BSModel >> thePromeneurSeuls: anObject [
 
 	thePromeneurSeuls := anObject
+]
+
+{ #category : #accessing }
+BSModel >> theRestingPlaces [
+
+	^ theRestingPlaces
+]
+
+{ #category : #accessing }
+BSModel >> theRestingPlaces: anObject [
+
+	theRestingPlaces := anObject
 ]
 
 { #category : #accessing }

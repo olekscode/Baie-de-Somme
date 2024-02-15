@@ -132,7 +132,7 @@ self setDestinationToSeal.
 { #category : #behavior }
 BSWalker >> lookForSeals [
 
-siteWithSeal := self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell type = 'Land') ].
+self siteWithSeal: (self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell type = 'Land') ]).
 	
 ]
 
@@ -278,14 +278,13 @@ BSWalker >> siteWithSeal: anObject [
 BSWalker >> step [
 
 	self checkPosition.
-	self defineVision.
 	(energy = 0) ifTrue: [ ^ self goBackHome ].
-	self lookForSeals.
 	(self siteWithSeal isNotEmpty) 
 	ifTrue: [ self lookAtSeals ]
 	ifFalse: [ self lookForSpot ].
 	self moveToDestination.
-	self siteWithSeal removeAll.
+	self defineVision.
+	self lookForSeals.
 	
 
 
