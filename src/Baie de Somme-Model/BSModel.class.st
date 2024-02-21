@@ -3,13 +3,15 @@ Class {
 	#superclass : #CMAbstractModel,
 	#instVars : [
 		'theHabitatTypes',
-		'thePromeneurGuides',
-		'thePromeneurSeuls',
+		'theWalkerGuides',
+		'theWalkerAlones',
 		'theSeals',
+		'theBoatKayaks',
 		'theRestingPlaces',
 		'numberOfRows',
 		'numberOfColumns',
 		'home',
+		'homeSea',
 		'restingPlaces'
 	],
 	#category : #'Baie de Somme-Model'
@@ -105,7 +107,7 @@ BSModel >> habitatTypeMatrix [
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -136,6 +138,18 @@ BSModel >> home: anObject [
 	home := anObject
 ]
 
+{ #category : #accessing }
+BSModel >> homeSea [
+
+	^ homeSea
+]
+
+{ #category : #accessing }
+BSModel >> homeSea: anObject [
+
+	homeSea := anObject
+]
+
 { #category : #initialization }
 BSModel >> initialize [ 
 
@@ -144,10 +158,11 @@ BSModel >> initialize [
 	numberOfRows := 30.
 	numberOfColumns:= 30.
 	
-	thePromeneurGuides := OrderedCollection new.
-	thePromeneurSeuls := OrderedCollection new.
+	theWalkerGuides := OrderedCollection new.
+	theWalkerAlones := OrderedCollection new.
 	theSeals := OrderedCollection new.
 	theHabitatTypes := OrderedCollection new.
+	theBoatKayaks := OrderedCollection new.
 ]
 
 { #category : #initialization }
@@ -169,18 +184,56 @@ BSModel >> initializeAgents [
 	self
 		createN: "self class initialNumberOfPromeneurGuides" 0
 		entity: BSWalkerGuide.
-		self thePromeneurGuides do: [ :guide | self initializeWalkerGuide: guide ].
+		self theWalkerGuides do: [ :guide | self initializeWalkerGuide: guide ].
 		
 	self
 		createN: "self class initialNumberOfPromeneurSeuls" 5
 		entity: BSWalkerAlone.
-		self thePromeneurSeuls do: [ :alone | self initializeWalkerAlone: alone ].
+		self theWalkerAlones do: [ :alone | self initializeWalkerAlone: alone ].
 		
 	self 
 		createN: 50 randomlyLocatedEntities: BSSeal constrainedBy: [ :cell | cell type = 'Sea' ].
 		self theSeals do: [ :alone | self initializeSeals: alone ].
+		
+	self
+		createN: 5
+		entity: BSBoatKayak.
+		self theBoatKayaks do: [ :alone | self initializeBoatKayak: alone ].
+		
 	
 
+]
+
+{ #category : #'init entities' }
+BSModel >> initializeBoatKayak: boat [
+
+|potentialDestination arg|
+
+	boat home: self homeSea.
+	"walker home: self home.
+	
+	potentialDestination := theHabitatTypes select: [ :cell | cell type = 'Sea' ].
+	
+	walker walkerDestination:  potentialDestination atRandom.
+	walker destinationMemory: walker walkerDestination neighbourhoodAndSelf.
+	
+	arg:= Cormas random.
+	(arg < 0.05) 
+		ifTrue: [ walker withDog: 'leashed'] 
+		ifFalse: [ (arg < 0.35) 
+				ifTrue: [ walker withDog: 'unleashed' ]
+				ifFalse: [ walker withDog: 'no' ] 
+				].
+			
+	arg:= Cormas random.
+	(arg < 0.2) 
+		ifTrue: [ walker withBinoculars: 'yes'] 
+		ifFalse: [ walker withBinoculars: 'no'].
+		
+	arg:= Cormas random.
+	(arg < 0.2) 
+		ifTrue: [ walker sealAwareness: 'yes'] 
+		ifFalse: [ walker sealAwareness: 'no']."
 ]
 
 { #category : #initialization }
@@ -194,6 +247,7 @@ BSModel >> initializeHabitatTypeFromMatrix [
 			matrixCellValue = 0 ifTrue: [ modelCell type: 'Sea' ].
 			matrixCellValue = 1 ifTrue: [ modelCell type: 'Land' ].
 			matrixCellValue = 2 ifTrue: [ modelCell type: 'Home' ].
+			matrixCellValue = 3 ifTrue: [ modelCell type: 'Home Sea' ].
 			] ]
 ]
 
@@ -284,7 +338,7 @@ BSModel >> initializeWalkerGuide: guide [
 BSModel >> numberOfPromeneurGuides [
 
 	<probe>
-	^ self thePromeneurGuides size
+	^ self theWalkerGuides size
 ]
 
 { #category : #accessing }
@@ -358,16 +412,19 @@ BSModel >> simpleEnvironment [
 	self initializeSealRestingPlacesFromMatrix.
 	self theRestingPlaces: (theHabitatTypes select: [:cell | cell sealRestingPlace ~= 'Not' and: [cell sealRestingPlace ~= 'Observatory' ]]).
 	self home: (theHabitatTypes detect: [ :cell | cell type = 'Home' ]).
+	self homeSea: (theHabitatTypes detect: [ :cell | cell type = 'Home Sea' ]).
 	self restingPlaces: #('R1' 'R2' 'R3').
 
 	self initializeAgents.
-	self thePromeneurGuides do: [ :guide | guide moveTo: home ].
-	self thePromeneurSeuls do: [ :guide | guide moveTo: home ].
+	self theWalkerGuides do: [ :guide | guide moveTo: home ].
+	self theWalkerAlones do: [ :alone | alone moveTo: home ].
+	self theBoatKayaks do: [ :kayak | kayak moveTo: homeSea ].
 	self theSeals do: [ :seal | (Cormas random < 0.5) ifTrue: [ seal randomJumpConstrainedBy: [ :cell | cell sealRestingPlace = seal restingPlace. ] ] ].
 	
 	self
 		displayPov: #povHabitatType of: BSHabitatCell;
 		displayPov: #defaultPOV of:  BSWalker;
+		displayPov: #defaultPOV of:  BSBoat;
 		displayPov: #defaultPOV of: BSSeal.
 ]
 
@@ -375,9 +432,23 @@ BSModel >> simpleEnvironment [
 BSModel >> step: anObject [
 
 	self askRandom: BSWalker toDo: #step.
+	self askRandom: BSBoat toDo: #step.
 	"self askRandom: BSHabitatCell toDo: #step."
 	self askRandom: BSSeal toDo: #step.
 	self askRandom: BSSeal toDo: #stepAlert
+]
+
+{ #category : #accessing }
+BSModel >> theBoatKayaks [
+	<getterFor: #BSBoatKayak>
+		
+	^ theBoatKayaks
+]
+
+{ #category : #accessing }
+BSModel >> theBoatKayaks: anObject [
+
+	theBoatKayaks := anObject
 ]
 
 { #category : #accessing }
@@ -391,32 +462,6 @@ BSModel >> theHabitatTypes [
 BSModel >> theHabitatTypes: anObject [
 
 	theHabitatTypes := anObject
-]
-
-{ #category : #accessing }
-BSModel >> thePromeneurGuides [
-	<getterFor: #BSWalkerGuide>	
-
-	^ thePromeneurGuides
-]
-
-{ #category : #accessing }
-BSModel >> thePromeneurGuides: anObject [
-
-	thePromeneurGuides := anObject
-]
-
-{ #category : #accessing }
-BSModel >> thePromeneurSeuls [
-	<getterFor: #BSWalkerAlone>
-
-	^ thePromeneurSeuls
-]
-
-{ #category : #accessing }
-BSModel >> thePromeneurSeuls: anObject [
-
-	thePromeneurSeuls := anObject
 ]
 
 { #category : #accessing }
@@ -443,9 +488,35 @@ BSModel >> theSeals: anObject [
 	theSeals := anObject
 ]
 
+{ #category : #accessing }
+BSModel >> theWalkerAlones [
+	<getterFor: #BSWalkerAlone>
+
+	^ theWalkerAlones
+]
+
+{ #category : #accessing }
+BSModel >> theWalkerAlones: anObject [
+
+	theWalkerAlones := anObject
+]
+
+{ #category : #accessing }
+BSModel >> theWalkerGuides [
+	<getterFor: #BSWalkerGuide>	
+
+	^ theWalkerGuides
+]
+
+{ #category : #accessing }
+BSModel >> theWalkerGuides: anObject [
+
+	theWalkerGuides := anObject
+]
+
 { #category : #probes }
 BSModel >> totalSatisfaction [
 
 	<probe>
-	^ (self thePromeneurGuides sum: [ :each | each satisfaction ]) + (self thePromeneurSeuls sum: [ :each | each satisfaction ])
+	^ (self theWalkerGuides sum: [ :each | each satisfaction ]) + (self theWalkerAlones sum: [ :each | each satisfaction ])
 ]

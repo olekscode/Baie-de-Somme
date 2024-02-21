@@ -98,6 +98,8 @@ BSHabitatCell >> povHabitatType [
 	self type = 'Land' ifTrue: [ ^ Color yellow ].
 	
 	self type = 'Sea' ifTrue: [ ^ Color blue ].
+	
+	self type = 'Home Sea' ifTrue: [ ^ Color black ].
 		 
 ]
 
