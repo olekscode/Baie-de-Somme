@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'type',
 		'accessRule',
+		'kayakWay',
 		'sealRestingPlace',
 		'walkerObservatory',
 		'threatLevel',
@@ -79,6 +80,18 @@ BSHabitatCell >> initializeWithRandomHabitat [
 ]
 
 { #category : #accessing }
+BSHabitatCell >> kayakWay [
+
+	^ kayakWay
+]
+
+{ #category : #accessing }
+BSHabitatCell >> kayakWay: anObject [
+
+	kayakWay := anObject
+]
+
+{ #category : #accessing }
 BSHabitatCell >> numberOfWalker [
 
 	^ numberOfWalker
@@ -91,24 +104,50 @@ BSHabitatCell >> numberOfWalker: anObject [
 ]
 
 { #category : #pov }
+BSHabitatCell >> povAccessRule [
+
+		self accessRule  = 'Sea' ifTrue: [ ^ Color blue ].
+		self accessRule  = 'Land' ifTrue: [ ^ Color yellow ].
+		self accessRule  = 'Walker Home' ifTrue: [ ^ Color red ].
+		self accessRule  = 'Kayak Home' ifTrue: [ ^ Color green ].
+		self accessRule  = 'Boat Home' ifTrue: [ ^ Color purple ].
+		self accessRule  = 'Kayak Objective' ifTrue: [ ^ Color cyan ].
+]
+
+{ #category : #pov }
 BSHabitatCell >> povHabitatType [
 
 	self type = 'Home' ifTrue: [ ^ Color black  ].
 	
-	self type = 'Land' ifTrue: [ ^ Color yellow ].
+	self type = 'Land' ifTrue: [ ^ Color brown ].
 	
 	self type = 'Sea' ifTrue: [ ^ Color blue ].
 	
 	self type = 'Home Sea' ifTrue: [ ^ Color black ].
+	
+	self type = 'Schorre' ifTrue: [ ^ Color green ].
+	
+	self type = 'Beach' ifTrue: [ ^ Color yellow ].
+	
+	self type = 'City' ifTrue: [ ^ Color black ].
 		 
+]
+
+{ #category : #pov }
+BSHabitatCell >> povKayakWay [
+
+	self kayakWay  = 'Way' ifTrue: [ ^ Color red   ].
+	self kayakWay  = 'Not' ifTrue: [ ^ Color black  ].
+	self kayakWay  = 'Sea' ifTrue: [ ^ Color blue  ].
+	self kayakWay  = 'Land' ifTrue: [ ^ Color yellow  ].
 ]
 
 { #category : #pov }
 BSHabitatCell >> povLegalStatus [
 
-	self accessRule = 'Accessible' ifTrue: [ ^ Color pink  ].
+	self accessRule = 'By Sea' ifTrue: [ ^ Color blue ].
 	
-	self accessRule = 'Forbidden' ifTrue: [ ^ Color black ].
+	self accessRule = 'By Land' ifTrue: [ ^ Color yellow ].
 	
 		 
 ]
@@ -117,20 +156,29 @@ BSHabitatCell >> povLegalStatus [
 BSHabitatCell >> povRestingPlace [
 
 	self sealRestingPlace  = 'R1' ifTrue: [ ^ Color green ].
-	self sealRestingPlace  = 'R2' ifTrue: [ ^ Color green ].
+	self sealRestingPlace  = 'BH' ifTrue: [ ^ Color yellow ].
+	self sealRestingPlace  = 'R2' ifTrue: [ ^ Color orange ].
+	self sealRestingPlace  = 'R3 Nord' ifTrue: [ ^ Color green ].
+	self sealRestingPlace  = 'R3 Sud' ifTrue: [ ^ Color green ].
 	self sealRestingPlace  = 'R3' ifTrue: [ ^ Color green ].
+	self sealRestingPlace  = 'R4' ifTrue: [ ^ Color blue ].
+	self sealRestingPlace  = 'R5 Nord' ifTrue: [ ^ Color red ].
+	self sealRestingPlace  = 'R5 Centre' ifTrue: [ ^ Color red ].
+	self sealRestingPlace  = 'R5 Pointe' ifTrue: [ ^ Color red ].
+	self sealRestingPlace  = 'R5 Mollière' ifTrue: [ ^ Color red ].
+	self sealRestingPlace  = 'R5' ifTrue: [ ^ Color red ].
+	self sealRestingPlace  = 'R6' ifTrue: [ ^ Color pink ].
+	self sealRestingPlace  = 'R7 Virage' ifTrue: [ ^ Color purple ].
+	self sealRestingPlace  = 'R7 Apres Passe' ifTrue: [ ^ Color purple ].
+	self sealRestingPlace  = 'R7 Reste' ifTrue: [ ^ Color purple ].
+	self sealRestingPlace  = 'R7' ifTrue: [ ^ Color purple ].
+	self sealRestingPlace  = 'R8' ifTrue: [ ^ Color magenta ].
+	self sealRestingPlace  = 'FM' ifTrue: [ ^ Color cyan ].
 	self sealRestingPlace  = 'Observatory' ifTrue: [ ^ Color yellow ].
 	self sealRestingPlace  = 'Not' ifTrue: [ ^ Color black ].
-]
-
-{ #category : #pov }
-BSHabitatCell >> povThreatLevel [
-
-		^ self
-		povAttribute: #threatLevel
-		min: 0
-		max: 4
-		color: Color red
+	self sealRestingPlace  = 'Empty' ifTrue: [ ^ Color black ].
+	self sealRestingPlace  = 'Land' ifTrue: [ ^ Color brown ].
+	self sealRestingPlace  = 'Sea' ifTrue: [ ^ Color black ].
 ]
 
 { #category : #accessing }

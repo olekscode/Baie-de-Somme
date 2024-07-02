@@ -6,10 +6,79 @@ Class {
 	#instVars : [
 		'home',
 		'satisfaction',
-		'energy'
+		'energy',
+		'siteWithSeal',
+		'sight',
+		'boatDestination',
+		'boatDirection',
+		'boatAction',
+		'actionCount',
+		'sealAwareness',
+		'wayMemory'
 	],
 	#category : #'Baie de Somme-Model'
 }
+
+{ #category : #accessing }
+BSBoat >> actionCount [
+
+	^ actionCount
+]
+
+{ #category : #accessing }
+BSBoat >> actionCount: anObject [
+
+	actionCount := anObject
+]
+
+{ #category : #accessing }
+BSBoat >> boatAction [
+
+	^ boatAction
+]
+
+{ #category : #accessing }
+BSBoat >> boatAction: anObject [
+
+	boatAction := anObject
+]
+
+{ #category : #accessing }
+BSBoat >> boatDestination [
+
+	^ boatDestination
+]
+
+{ #category : #accessing }
+BSBoat >> boatDestination: anObject [
+
+	boatDestination := anObject
+]
+
+{ #category : #accessing }
+BSBoat >> boatDirection [
+
+	^ boatDirection
+]
+
+{ #category : #accessing }
+BSBoat >> boatDirection: anObject [
+
+	boatDirection := anObject
+]
+
+{ #category : #behavior }
+BSBoat >> defineVision [
+
+	|scope1 scope2|
+	scope1 := OrderedCollection new.
+	scope2 := OrderedCollection new.
+	scope1 := patch neighbourhoodAndSelf.
+	scope2 := scope1.
+	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
+	scope2 removeDuplicates.
+	self sight: scope2.
+]
 
 { #category : #accessing }
 BSBoat >> energy [
@@ -38,10 +107,56 @@ BSBoat >> home: anObject [
 { #category : #initialization }
 BSBoat >> initialize [ 
 
+|arg|
 	super initialize.
 	satisfaction := 0.
 	energy := (Cormas random * 100) rounded.
-	"siteWithSeal := OrderedCollection new."
+	siteWithSeal := OrderedCollection new.
+	self boatAction: 'Navigate'.
+	
+	arg:= Cormas random.
+	(arg < 0.2) 
+		ifTrue: [ self sealAwareness: 0] 
+		ifFalse: [ 
+			(arg > 0.8) 
+				ifTrue: [self sealAwareness: 2]
+				ifFalse: [ self sealAwareness: 1 ]].
+				
+]
+
+{ #category : #behavior }
+BSBoat >> lookForSeals [
+
+self siteWithSeal: (self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell sealRestingPlace = self boatDirection ) ]).
+	
+]
+
+{ #category : #moving }
+BSBoat >> moveInDirectionOf: aCell constraintOnPath: aBlock [
+	"Purpose: moves one cell in direction of a given location, taking a specified constraint on each cell of the path to destination.
+Argument: aCell = <SpatialEntityElement>
+Example: self moveTowards: self house patch constraintOnPath: [:c | c isClosed not]"
+
+	| path candidate dist|
+	dist:=3.
+	
+	self isSituated ifTrue: [
+		self patch = aCell ifFalse: [
+			path := self patch wayTo: aCell.
+			"path remove: self patch."
+			
+			path do: [ :cell | (self patch distanceTo: cell) < dist ifTrue: 
+				[ candidate := cell asOrderedCollection. dist := self patch distanceTo: cell ] ].
+			
+			candidate:= candidate select: [ :c | aBlock value: c ].
+			candidate isNotEmpty ifTrue: [ self moveTo: candidate atRandom ]] ]
+]
+
+{ #category : #behavior }
+BSBoat >> moveToDestination [ 
+
+"self previousCell: self patch."
+self moveInDirectionOf: boatDestination constraintOnPath: [ :cell | cell kayakWay = 'Way']
 ]
 
 { #category : #pov }
@@ -62,8 +177,96 @@ BSBoat >> satisfaction: anObject [
 	satisfaction := anObject
 ]
 
+{ #category : #accessing }
+BSBoat >> sealAwareness [
+
+	^ sealAwareness
+]
+
+{ #category : #accessing }
+BSBoat >> sealAwareness: anObject [
+
+	sealAwareness := anObject
+]
+
+{ #category : #behavior }
+BSBoat >> setBoatDestination [
+
+| candidates |
+
+(self boatDirection = 'Home Sea') ifTrue: [ ^ self boatDestination: self home ].
+
+candidates := repositoryMemory select: [ :cell | cell sealRestingPlace = self boatDirection ].
+
+self boatDestination: candidates atRandom.
+	
+]
+
+{ #category : #initialization }
+BSBoat >> setBoatDirection [
+
+| distMin |
+
+self wayMemory ifEmpty: [ ^self boatDirection: 'Home Sea' ].
+
+distMin := self patch distanceTo: (self wayMemory first).
+self boatDirection: (self wayMemory first) sealRestingPlace.
+
+repositoryMemory do: [ :cell | ((self patch distanceTo: cell) < distMin)
+	ifTrue: [ 
+		distMin:= self patch distanceTo: cell.
+		self boatDirection: (cell sealRestingPlace) ] 
+	].
+]
+
+{ #category : #behavior }
+BSBoat >> setDestinationToSeal [
+
+self boatDestination: self siteWithSeal atRandom.
+]
+
+{ #category : #accessing }
+BSBoat >> sight [
+
+	^ sight
+]
+
+{ #category : #accessing }
+BSBoat >> sight: anObject [
+
+	sight := anObject
+]
+
+{ #category : #accessing }
+BSBoat >> siteWithSeal [
+
+	^ siteWithSeal
+]
+
+{ #category : #accessing }
+BSBoat >> siteWithSeal: anObject [
+
+	siteWithSeal := anObject
+]
+
 { #category : #stepping }
 BSBoat >> step [
 
-self randomWalkConstrainedBy: [ :cell | cell type = 'Sea' ]
+self subclassResponsibility.
+
+
+
+	
+]
+
+{ #category : #accessing }
+BSBoat >> wayMemory [
+
+	^ wayMemory
+]
+
+{ #category : #accessing }
+BSBoat >> wayMemory: anObject [
+
+	wayMemory := anObject
 ]

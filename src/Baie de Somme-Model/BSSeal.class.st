@@ -5,17 +5,27 @@ Class {
 	#classTraits : 'TCMLocated classTrait',
 	#instVars : [
 		'restingPlace',
-		'sightSea',
-		'sightLand',
-		'sightRepository',
+		'sight',
 		'alertLevel',
 		'myRestingPlace',
 		'restingPlaceMemory',
-		'energyInWater',
-		'energy'
+		'actionCount',
+		'sealAction'
 	],
 	#category : #'Baie de Somme-Model'
 }
+
+{ #category : #accessing }
+BSSeal >> actionCount [
+
+	^ actionCount
+]
+
+{ #category : #accessing }
+BSSeal >> actionCount: anObject [
+
+	actionCount := anObject
+]
 
 { #category : #accessing }
 BSSeal >> alertLevel [
@@ -43,79 +53,63 @@ friends do: [ :seal | self giveAlertTo: seal ].
 ]
 
 { #category : #behavior }
+BSSeal >> changeActionToCheckRepository [
+
+self sealAction: 'Check repository'.
+self actionCount: (Cormas random * 100 + 5) rounded.
+]
+
+{ #category : #behavior }
+BSSeal >> changeActionToResting [
+
+|candidates|
+
+candidates := self patch neighbourhood select: [ :cell | cell sealRestingPlace = self restingPlace ].
+
+self sealAction: 'Resting'.
+self actionCount: 0.
+self moveTo: (candidates atRandom).
+]
+
+{ #category : #behavior }
+BSSeal >> changeActionToSwimming [
+
+self sealAction: 'Swimming'.
+self actionCount: (Cormas random * 10 + 10) rounded.
+]
+
+{ #category : #behavior }
+BSSeal >> changeRepository [
+
+self selectRepository.
+self changeActionToSwimming.
+]
+
+{ #category : #behavior }
 BSSeal >> defineVision [
 
-self defineVisionLand.
-self defineVisionSea.
-]
-
-{ #category : #behavior }
-BSSeal >> defineVisionLand [
-
 |scope1 scope2|
 	scope1 := OrderedCollection new.
 	scope2 := OrderedCollection new.
 	scope1 := patch neighbourhoodAndSelf.
-	scope2 := scope1 select: [ :cell | cell type = 'Land' ].
-	scope1 := scope2.
+	scope2 := scope1.
 	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
 	scope2 removeDuplicates.
-	scope2 := scope1 select: [ :cell | cell type = 'Land' ].
-	scope1 := scope2.
-	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
-	scope2 removeDuplicates.
-	scope2 := scope1 select: [ :cell | cell type = 'Land' ].
-	self sightLand: scope2.
-]
-
-{ #category : #behavior }
-BSSeal >> defineVisionSea [
-
-|scope1 scope2|
-	scope1 := OrderedCollection new.
-	scope2 := OrderedCollection new.
-	scope1 := patch neighbourhoodAndSelf.
-	scope2 := scope1 select: [ :cell | cell type = 'Sea' ].
-	scope1 := scope2.
-	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
-	scope2 removeDuplicates.
-	scope2 := scope1 select: [ :cell | cell type = 'Sea' ].
-	scope1 := scope2.
-	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
-	scope2 removeDuplicates.
-	scope2 := scope1 select: [ :cell | cell type = 'Sea' ].
-	self sightSea: scope2.
-]
-
-{ #category : #accessing }
-BSSeal >> energy [
-
-	^ energy
-]
-
-{ #category : #accessing }
-BSSeal >> energy: anObject [
-
-	energy := anObject
-]
-
-{ #category : #accessing }
-BSSeal >> energyInWater [
-
-	^ energyInWater
-]
-
-{ #category : #accessing }
-BSSeal >> energyInWater: anObject [
-
-	energyInWater := anObject
+	self sight: scope2.
 ]
 
 { #category : #behavior }
 BSSeal >> escapeInSea [
 
-self randomWalkConstrainedBy: 	[ :cell | cell type = 'Sea' ].
-self alertLevel: 0.
+| candidatePatch occupiedRestingPlaces|
+
+candidatePatch := self patch neighbourhood select: [ :cell | cell type = 'Sea'  ].
+
+self moveTo: candidatePatch atRandom.
+self changeActionToSwimming.
+
+occupiedRestingPlaces := self patch neighbourhood select: [ :cell | cell hasOccupantsOfClass: self class ].
+occupiedRestingPlaces do: [ :cell | cell theOccupants do: [ :occupantTable | occupantTable do: [ :seal | (seal class = #BSSeal) ifTrue: [ self giveAlertTo: seal ] ] ] ].
 ]
 
 { #category : #behavior }
@@ -129,10 +123,6 @@ BSSeal >> initialize [
 
 	super initialize.
 	self alertLevel: 0.
-	self energyInWater: 0.
-	self energy: (30 + (Cormas random * 90) rounded).
-	self energyInWater: ((Cormas random * self energy) rounded). 
-	
 	
 
 ]
@@ -140,7 +130,7 @@ BSSeal >> initialize [
 { #category : #behavior }
 BSSeal >> isAlerted [
 
-self alertLevel: 3.
+self alertLevel: 2.
 ]
 
 { #category : #behavior }
@@ -153,7 +143,7 @@ destinationToRepository := (self patch neighbourhood select: [:cell | cell sealR
 destinationToRepository isEmpty
  ifTrue: [^ self moveToRestingPlace].
 
-(self myRestingPlace select: [ :cell | cell hasOccupantsOfClass: BSWalker ]) isEmpty
+(self myRestingPlace select: [ :cell | (cell hasOccupantsOfClass: BSWalker) or: [ cell hasOccupantsOfClass: BSBoat ] ]) isEmpty
 	ifTrue: [ self moveTo: destinationToRepository atRandom ]
 	ifFalse: [ self selectNewRestingPlace ]
 
@@ -175,23 +165,91 @@ number := 0.
 ]
 
 { #category : #behavior }
-BSSeal >> monitorSurroundings [
+BSSeal >> monitorRepository [
 
-| danger |
-danger := 0.
+| securityLevel |
+securityLevel := 0.
 
-(self patch neighbourhood select: [ :cell | cell hasOccupantsOfClass: BSWalker "or: [ cell hasOccupantsOfClass: BSBoat ]" ]) isNotEmpty ifTrue: [ ^ self alertLevel: 2 ].
+(self sight anySatisfy: [:cell | (cell hasOccupantsOfClass: BSBoat) or: [ cell hasOccupantsOfClass: BSWalker ] ]) ifTrue: [ securityLevel := 1 ].
 
-self monitorLand ifFalse: [ ^ self ].
-alertLevel := alertLevel + 1. danger := 1.
+^ (securityLevel = 0)
+
+]
+
+{ #category : #behavior }
+BSSeal >> monitorSurroundingsOnRepository [
+
+(self patch neighbourhood anySatisfy: [ :cell | (cell hasOccupantsOfClass: BSWalker) or: [ cell hasOccupantsOfClass: BSBoat ] ])
+	ifTrue: [ ^ self alertLevel: 2 ].
+	
+(self sight anySatisfy: [ :cell | (cell hasOccupantsOfClass: BSWalker) ])
+	ifTrue: [ ^ self alertLevel: 1 ].
+	
+self alertLevel: 0.
+]
+
+{ #category : #behavior }
+BSSeal >> moveAroundRepository [
+
+	| candidates |
+	candidates := self patch neighbourhoodAndSelf select: [ :cell | 
+		              cell type = 'Sea' ].
+	candidates := candidates reject: [ :cell | 
+		              self patch hasOccupantsOfClass: BSBoat ].
+	candidates := candidates select: [ :cell | 
+		              self patch neighbourhood anySatisfy: [ :x | 
+			              x sealRestingPlace = self restingPlace ] ].
+	
+candidates ifEmpty: [ self changeActionToSwimming. ] ifNotEmpty: [ self moveTo: candidates atRandom ].
+]
+
+{ #category : #behavior }
+BSSeal >> moveAwayFromThreat [
+
+|candidates|
+candidates := OrderedCollection new.
+
+self patch neighbourhoodAndSelf do: [ :cell | (cell neighbourhood anySatisfy: [ :cell2 | (cell2 hasOccupantsOfClass: BSBoat) or: [ cell2 hasOccupantsOfClass: BSWalker ] ]) ifFalse: [candidates add: cell]].
+
+candidates:= candidates select: [ :cell | cell type = 'Sea' ].
+
+candidates ifEmpty: [ ^ self alertLevel: 0 ].
+
+self moveTo: (candidates atRandom).
+self alertLevel: 0.
+]
+
+{ #category : #moving }
+BSSeal >> moveInDirectionOf: aCell constraintOnPath: aBlock [
+	"Purpose: moves one cell in direction of a given location, taking a specified constraint on each cell of the path to destination.
+Argument: aCell = <SpatialEntityElement>
+Example: self moveTowards: self house patch constraintOnPath: [:c | c isClosed not]"
+
+	| path candidate dist|
+	dist:=3.
+	
+	self isSituated ifTrue: [
+		self patch = aCell ifFalse: [
+			path := self patch wayTo: aCell.
+			"path remove: self patch."
+			
+			path do: [ :cell | (self patch distanceTo: cell) < dist ifTrue: 
+				[ candidate := cell asOrderedCollection. dist := self patch distanceTo: cell ] ].
+			
+			candidate:= candidate select: [ :c | aBlock value: c ].
+			candidate isNotEmpty ifTrue: [ self moveTo: candidate atRandom ]] ]
 ]
 
 { #category : #behavior }
 BSSeal >> moveInWater [
 
-self randomWalkConstrainedBy: [ :cell | cell type = 'Sea' ].
+| candidates |
 
-energyInWater:= energyInWater - 1.
+candidates:= self patch neighbourhoodAndSelf select: [ :cell | (cell type = 'Sea')].
+
+self moveTo: candidates atRandom.
+
+self actionCount: actionCount - 1.
 ]
 
 { #category : #behavior }
@@ -205,6 +263,15 @@ self moveTowards: directionToRepository constraintOnPath: [ :cell | cell type = 
 
 ]
 
+{ #category : #behavior }
+BSSeal >> moveTowardRepository [
+
+self moveTowards: myRestingPlace constraintOnPath: [ :cell | (cell type = 'Sea') or: [ (cell = myRestingPlace )] ].
+
+(self patch neighbourhood anySatisfy: [ :cell | cell = myRestingPlace ])
+	ifTrue: [ self changeActionToCheckRepository ].
+]
+
 { #category : #accessing }
 BSSeal >> myRestingPlace [
 
@@ -215,6 +282,19 @@ BSSeal >> myRestingPlace [
 BSSeal >> myRestingPlace: anObject [
 
 	myRestingPlace := anObject
+]
+
+{ #category : #'as yet unclassified' }
+BSSeal >> playWithBoat [
+
+| candidates|
+candidates := OrderedCollection new.
+
+candidates := self sight select: [ :cell | (cell hasOccupantsOfClass: BSBoat) and: [ cell type = 'Sea']].
+
+self moveTowards: (candidates atRandom) constraintOnPath: [ :cell | cell type = 'Sea' ].
+
+self curiosity: self curiosity - 1.
 ]
 
 { #category : #pov }
@@ -247,6 +327,18 @@ BSSeal >> restingPlaceMemory: anObject [
 	restingPlaceMemory := anObject
 ]
 
+{ #category : #accessing }
+BSSeal >> sealAction [
+
+	^ sealAction
+]
+
+{ #category : #accessing }
+BSSeal >> sealAction: anObject [
+
+	sealAction := anObject
+]
+
 { #category : #behavior }
 BSSeal >> selectNewRestingPlace [
 
@@ -258,74 +350,77 @@ self restingPlace: (Cormas selectRandomlyFrom: restingPlaceMemory constrainedBy:
 self myRestingPlace: (restingPlaceMemory select: [ :cell | cell sealRestingPlace = restingPlace ]).
 ]
 
-{ #category : #accessing }
-BSSeal >> sightLand [
+{ #category : #behavior }
+BSSeal >> selectRepository [
 
-	^ sightLand
+| formerRestingPlace |
+
+formerRestingPlace := self myRestingPlace. 
+
+self myRestingPlace: (self restingPlaceMemory select: [ :cell | cell ~= formerRestingPlace ]).
 ]
 
 { #category : #accessing }
-BSSeal >> sightLand: anObject [
+BSSeal >> sight [
 
-	sightLand := anObject
+	^ sight
 ]
 
 { #category : #accessing }
-BSSeal >> sightRepository [
+BSSeal >> sight: anObject [
 
-	^ sightRepository
-]
-
-{ #category : #accessing }
-BSSeal >> sightRepository: anObject [
-
-	sightRepository := anObject
-]
-
-{ #category : #accessing }
-BSSeal >> sightSea [
-
-	^ sightSea
-]
-
-{ #category : #accessing }
-BSSeal >> sightSea: anObject [
-
-	sightSea := anObject
+	sight := anObject
 ]
 
 { #category : #stepping }
 BSSeal >> step [
-
-	(self patch type = 'Sea') 
-		ifTrue: [ self stepInSea ]
-		ifFalse: [ self stepOnLand ].
+	
+	self sealAction ifNil: [ self stepSealStart ].
+		
+	(self sealAction = 'Resting') ifTrue: [ self stepResting ].
+	(self sealAction = 'Swimming') ifTrue: [ self stepSwimming ].
+	(self sealAction = 'Check repository') ifTrue: [ self stepCheckRepository ].
 ]
 
 { #category : #stepping }
-BSSeal >> stepAlert [
+BSSeal >> stepCheckRepository [
 
-(self alertLevel > 1) ifTrue: [ ^ self escapeInSea ].
+self defineVision.
 
-(self alertLevel = 1) ifTrue: [ ^ energyInWater := energyInWater + 1 ].
+((self monitorRepository) & (self patch neighbourhoodAndSelf anySatisfy: [ :x | x sealRestingPlace = self restingPlace ])) ifTrue: [ ^ self changeActionToResting ].
+(self actionCount = 0) ifTrue: [ ^ self changeActionToSwimming ].
+self moveAroundRepository.
+(self actionCount > 0) ifTrue: [ actionCount := actionCount - 1 ].
 
-(self patch type = 'Land') ifTrue: [energyInWater := energyInWater + 2].
+
 ]
 
 { #category : #stepping }
-BSSeal >> stepInSea [
+BSSeal >> stepResting [
 
-(self energyInWater = 0) ifTrue: [ ^ self lookForRepository ].
+self defineVision.
+(self alertLevel < 2) ifTrue: [self monitorSurroundingsOnRepository].
+(self alertLevel > 1) ifTrue: [ self escapeInSea ].
+]
+
+{ #category : #stepping }
+BSSeal >> stepSealStart [
+
+(self patch type = 'Beach') ifTrue: [ self changeActionToResting ].
+
+(self patch type = 'Sea') ifTrue: [ self changeActionToSwimming ].
+]
+
+{ #category : #stepping }
+BSSeal >> stepSwimming [
+
+self defineVision.
+	
+(self actionCount = 0)
+	ifTrue: [ ^ self moveTowardRepository ].
+
 self moveInWater.
 
 
-]
 
-{ #category : #stepping }
-BSSeal >> stepOnLand [
-
-(self alertLevel = 3) ifTrue: [ ^ self ].
-self defineVision.
-self monitorSurroundings.
-(self alertLevel = 2) ifTrue: [ self alertRepository ].
 ]

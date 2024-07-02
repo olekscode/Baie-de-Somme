@@ -136,8 +136,11 @@ self siteWithSeal: (self sight select: [ :cell | (cell hasOccupantsOfClass: BSSe
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #behavior }
 BSWalker >> lookForSpot [
+
+	self subclassResponsibility
+
 ]
 
 { #category : #moving }
