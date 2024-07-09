@@ -740,6 +740,7 @@ BSModel >> initializeBoatKayak [
 	boat home: self homeSea atRandom.
 	boat moveTo: boat home.
 	boat boatDestination: (theHabitatTypes detect: [ :cell | cell accessRule = 'Kayak Objective' ]).
+	boat restingPlaceMemory: self restingPlaces. 
 ]
 
 { #category : #'init entities' }
@@ -747,6 +748,26 @@ BSModel >> initializeBoatKayak: boat [
 
 	boat home: self homeSea.		
 	boat wayMemory: theRestingPlaces.
+]
+
+{ #category : #'init entities' }
+BSModel >> initializeBoatMotorized [
+
+| boat |
+	
+	self createN: 1 entity: BSBoatMotorized.
+	
+	boat := theBoatMotorizeds last.
+	boat home: (theHabitatTypes detect: [ :cell | cell accessRule = 'Boat Home']).
+	boat moveTo: boat home.
+	boat boatDestination: OrderedCollection new.
+	boat boatDestination add: (theHabitatTypes detect: [ :cell | cell boatWay = 'Stop 1']).
+	boat boatDestination add: (theHabitatTypes detect: [ :cell | cell boatWay = 'Stop 2']).
+	boat boatDestination add: (theHabitatTypes detect: [ :cell | cell boatWay = 'Stop 3']).
+	boat boatDestination add: (theHabitatTypes detect: [ :cell | cell boatWay = 'Stop 4']).
+	boat boatDestination add: (theHabitatTypes detect: [ :cell | cell boatWay = 'Stop 5']).
+	boat boatDestination add: (theHabitatTypes detect: [ :cell | cell boatWay = 'Stop 6']).
+	boat boatDestination add: boat home.
 ]
 
 { #category : #'init entities' }
@@ -781,6 +802,29 @@ BSModel >> initializeBoatMotorized: boat [
 		ifFalse: [ boat sealAwareness: 'no'].
 		
 	boat wayMemory: theRestingPlaces.
+]
+
+{ #category : #initialization }
+BSModel >> initializeBoatWayFromMatrix: grid [
+
+	| matrixCellValue modelCell matrix |
+	
+	(grid = 'Simple') ifTrue: [ matrix := self simpleBoatWayMatrix ].
+	
+	1 to: numberOfRows do: [ :i | 
+		1 to: numberOfColumns do: [ :j | 
+			matrixCellValue := (matrix at: i) at: j.
+			modelCell := self pickCellAt: j @ i.
+			matrixCellValue = 0 ifTrue: [ modelCell boatWay: 'Sea' ].
+			matrixCellValue = 1 ifTrue: [ modelCell boatWay: 'Land' ].
+			matrixCellValue = 2 ifTrue: [ modelCell boatWay: 'Way' ].
+			matrixCellValue = 3 ifTrue: [ modelCell boatWay: 'Stop 1' ].
+			matrixCellValue = 4 ifTrue: [ modelCell boatWay: 'Stop 2' ].
+			matrixCellValue = 5 ifTrue: [ modelCell boatWay: 'Stop 3' ].
+			matrixCellValue = 6 ifTrue: [ modelCell boatWay: 'Stop 4' ].
+			matrixCellValue = 7 ifTrue: [ modelCell boatWay: 'Stop 5' ].
+			matrixCellValue = 8 ifTrue: [ modelCell boatWay: 'Stop 6' ].
+			] ]
 ]
 
 { #category : #'init entities' }
@@ -827,6 +871,7 @@ BSModel >> initializeGrid: grid [
 		self initializeKayakWayFromMatrix: grid.
 		self initializeHabitatTypeFromMatrix: grid.
 		self initializeSealRestingPlacesFromMatrix: grid.
+		self initializeBoatWayFromMatrix: grid.
 		 ]
 ]
 
@@ -977,6 +1022,13 @@ BSModel >> initializeWalkerGuide: guide [
 
 ]
 
+{ #category : #probes }
+BSModel >> kayakSatisfaction [
+
+	<probe>
+	^ (self theBoatKayaks sum: [ :each | each satisfaction ])
+]
+
 { #category : #'as yet unclassified' }
 BSModel >> kayakWayMatrix [
 
@@ -1065,7 +1117,7 @@ BSModel >> numberOfColumns: anObject [
 ]
 
 { #category : #probes }
-BSModel >> numberOfPromeneurGuides [
+BSModel >> numberOfKayak [
 
 	<probe>
 	^ self theWalkerGuides size
@@ -1271,13 +1323,63 @@ BSModel >> simpleAccessRuleMatrix [
 ( 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 )
 ( 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 )
 ( 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 0 0 1 1 1 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 )
-( 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 1 0 0 0 0 0 )
+( 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 1 0 0 0 0 4 )
 ( 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 3 )
 ( 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 1 1 1 )
 ( 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 )
 ( 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 )
 ( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 1 1 1 1 1 1 1 )
-( 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3 4 0 0 0 0 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3 0 0 0 0 0 1 1 1 1 1 1 1 )
+	).
+		
+	(matrix size = numberOfRows and: [ matrix allSatisfy: [ :row | row size = numberOfColumns ] ])
+		ifFalse: [ self error: 'Matrix has the wrong dimensions' ].
+		
+	^ matrix
+]
+
+{ #category : #matrix }
+BSModel >> simpleBoatWayMatrix [
+
+	| matrix |
+	
+	matrix := #(
+		 ( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 1 1 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 1 1 1 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 2 2 2 4 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 2 2 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 2 0 1 1 1 1 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1 1 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 2 0 0 0 0 0 0 2 2 2 0 0 0 0 2 0 1 1 1 1 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 2 0 0 0 0 0 2 1 1 0 2 0 0 0 0 2 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 2 0 0 0 0 0 2 0 1 1 1 2 6 0 0 0 2 2 2 2 2 2 2 2 3 0 1 1 1 1 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 1 1 2 0 0 0 0 0 2 0 0 0 1 0 0 2 2 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 1 0 2 0 0 0 0 0 2 0 0 0 0 0 1 1 1 2 0 0 0 0 1 1 1 1 1 1 0 2 2 0 0 1 1 1 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 1 1 2 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 2 0 0 1 1 1 1 1 1 1 1 1 0 2 0 1 1 1 1 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 1 0 2 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 1 1 1 1 1 1 1 1 0 0 2 0 0 1 2 2 8 2 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 0 1 0 2 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 7 2 2 2 2 2 2 2 2 2 2 2 2 2 0 0 0 0 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 1 1 5 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 1 0 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 1 1 1 2 0 1 1 1 1 1 1 1 1 1 1 1 1 )
+( 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 0 0 0 1 1 1 1 0 0 0 2 2 )
+( 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 2 2 2 2 2 2 2 2 2 2 0 0 )
+( 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 1 1 1 )
+( 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 )
+( 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 1 1 1 1 1 1 1 )
+( 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 1 1 1 1 1 1 1 )
 	).
 		
 	(matrix size = numberOfRows and: [ matrix allSatisfy: [ :row | row size = numberOfColumns ] ])
@@ -1337,7 +1439,7 @@ BSModel >> simpleEnvironmentLowTide [
 
 "2 - Création des agent"
 "2.1 Kayak Création des phoques et placement des phoques"
-	numberOfSeals := 100.
+	numberOfSeals := 600.
 	self theRestingPlaces: (theHabitatTypes select: [:cell | cell sealRestingPlace ~= 'Not']).
 	self initializeSeals: numberOfSeals.
 	self placeSeals.
@@ -1518,15 +1620,18 @@ BSModel >> simpleSealRestingPlaceMatrix [
 { #category : #control }
 BSModel >> step: anObject [
 
-	theBoatKayaks ifNotEmpty: [ ((Cormas random) < 0.1) ifTrue: [ self initializeBoatKayak ]. ].
-	theBoatKayaks ifEmpty: [((Cormas random) < 0.1) ifTrue: [ self initializeBoatKayak ]].
+| proba |
+
 	"self askRandom: BSWalker toDo: #step."
 
 	"self askRandom: BSHabitatCell toDo: #step."
 	self askRandom: BSSeal toDo: #step.
-	self askRandom: BSBoat toDo: #step
+	self askRandom: BSBoat toDo: #step.
 	
+proba := (-0.0075 * theBoatKayaks size) + 0.15. 
+((Cormas random) < proba) ifTrue: [ self initializeBoatKayak ].
 
+self theBoatMotorizeds ifEmpty: [ self initializeBoatMotorized ].
 ]
 
 { #category : #accessing }
@@ -1616,11 +1721,4 @@ BSModel >> theWalkerGuides [
 BSModel >> theWalkerGuides: anObject [
 
 	theWalkerGuides := anObject
-]
-
-{ #category : #probes }
-BSModel >> totalSatisfaction [
-
-	<probe>
-	^ (self theWalkerGuides sum: [ :each | each satisfaction ]) + (self theWalkerAlones sum: [ :each | each satisfaction ])
 ]

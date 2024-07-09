@@ -5,6 +5,7 @@ Class {
 		'type',
 		'accessRule',
 		'kayakWay',
+		'boatWay',
 		'sealRestingPlace',
 		'walkerObservatory',
 		'threatLevel',
@@ -23,6 +24,18 @@ BSHabitatCell >> accessRule [
 BSHabitatCell >> accessRule: anObject [
 
 	accessRule := anObject
+]
+
+{ #category : #accessing }
+BSHabitatCell >> boatWay [
+
+	^ boatWay
+]
+
+{ #category : #accessing }
+BSHabitatCell >> boatWay: anObject [
+
+	boatWay := anObject
 ]
 
 { #category : #'as yet unclassified' }
@@ -112,6 +125,21 @@ BSHabitatCell >> povAccessRule [
 		self accessRule  = 'Kayak Home' ifTrue: [ ^ Color green ].
 		self accessRule  = 'Boat Home' ifTrue: [ ^ Color purple ].
 		self accessRule  = 'Kayak Objective' ifTrue: [ ^ Color cyan ].
+]
+
+{ #category : #pov }
+BSHabitatCell >> povBoatWay [
+
+	self boatWay  = 'Way' ifTrue: [ ^ Color red   ].
+	self boatWay  = 'Not' ifTrue: [ ^ Color black  ].
+	self boatWay  = 'Sea' ifTrue: [ ^ Color blue  ].
+	self boatWay  = 'Land' ifTrue: [ ^ Color yellow  ].
+	self boatWay  = 'Stop 1' ifTrue: [ ^ Color pink  ].
+	self boatWay  = 'Stop 2' ifTrue: [ ^ Color pink  ].
+	self boatWay  = 'Stop 3' ifTrue: [ ^ Color pink  ].
+	self boatWay  = 'Stop 4' ifTrue: [ ^ Color pink  ].
+	self boatWay  = 'Stop 5' ifTrue: [ ^ Color pink  ].
+	self boatWay  = 'Stop 6' ifTrue: [ ^ Color pink  ].
 ]
 
 { #category : #pov }

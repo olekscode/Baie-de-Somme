@@ -14,7 +14,8 @@ Class {
 		'boatAction',
 		'actionCount',
 		'sealAwareness',
-		'wayMemory'
+		'wayMemory',
+		'restingPlaceMemory'
 	],
 	#category : #'Baie de Somme-Model'
 }
@@ -77,6 +78,9 @@ BSBoat >> defineVision [
 	scope2 := scope1.
 	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
 	scope2 removeDuplicates.
+	scope2 := scope1.
+	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
+	scope2 removeDuplicates.
 	self sight: scope2.
 ]
 
@@ -113,6 +117,7 @@ BSBoat >> initialize [
 	energy := (Cormas random * 100) rounded.
 	siteWithSeal := OrderedCollection new.
 	self boatAction: 'Navigate'.
+	actionCount := 0.
 	
 	arg:= Cormas random.
 	(arg < 0.2) 
@@ -127,7 +132,7 @@ BSBoat >> initialize [
 { #category : #behavior }
 BSBoat >> lookForSeals [
 
-self siteWithSeal: (self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell sealRestingPlace = self boatDirection ) ]).
+self siteWithSeal: (self sight select: [ :cell | ((cell hasOccupantsOfClass: BSSeal) & (cell type = 'Beach'))]).
 	
 ]
 
@@ -166,6 +171,18 @@ BSBoat >> pov [
 ]
 
 { #category : #accessing }
+BSBoat >> restingPlaceMemory [
+
+	^ restingPlaceMemory
+]
+
+{ #category : #accessing }
+BSBoat >> restingPlaceMemory: anObject [
+
+	restingPlaceMemory := anObject
+]
+
+{ #category : #accessing }
 BSBoat >> satisfaction [
 
 	^ satisfaction
@@ -187,42 +204,6 @@ BSBoat >> sealAwareness [
 BSBoat >> sealAwareness: anObject [
 
 	sealAwareness := anObject
-]
-
-{ #category : #behavior }
-BSBoat >> setBoatDestination [
-
-| candidates |
-
-(self boatDirection = 'Home Sea') ifTrue: [ ^ self boatDestination: self home ].
-
-candidates := repositoryMemory select: [ :cell | cell sealRestingPlace = self boatDirection ].
-
-self boatDestination: candidates atRandom.
-	
-]
-
-{ #category : #initialization }
-BSBoat >> setBoatDirection [
-
-| distMin |
-
-self wayMemory ifEmpty: [ ^self boatDirection: 'Home Sea' ].
-
-distMin := self patch distanceTo: (self wayMemory first).
-self boatDirection: (self wayMemory first) sealRestingPlace.
-
-repositoryMemory do: [ :cell | ((self patch distanceTo: cell) < distMin)
-	ifTrue: [ 
-		distMin:= self patch distanceTo: cell.
-		self boatDirection: (cell sealRestingPlace) ] 
-	].
-]
-
-{ #category : #behavior }
-BSBoat >> setDestinationToSeal [
-
-self boatDestination: self siteWithSeal atRandom.
 ]
 
 { #category : #accessing }
