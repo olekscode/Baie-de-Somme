@@ -16,16 +16,26 @@ BSWalkerAlone class >> entityName [
 { #category : #behavior }
 BSWalkerAlone >> checkPosition [
 
-(self patch neighbourhood select: [ :each | each type = 'Sea' ]) isEmpty
-		ifFalse: [ ^ self destinationMemory removeAll ]
+	self walkerPath ifNotEmpty: [ ^ self ].
+	
+	(self patch = self home) ifTrue: [ ^ self walkerAction: 'Out' ].
+
+	self way remove: self patch.
+
+	self defineDestination
 ]
 
 { #category : #behavior }
-BSWalkerAlone >> defineVision [
+BSWalkerAlone >> defineDestination [
 
-(self withBinoculars = 'yes')
-	ifTrue: [ self defineVisionWihtBinolucars ]
-	ifFalse: [ self defineVisionWihtoutBinolucars ]
+	self way ifNotEmpty: [ 
+		self walkerDestination: way first.
+		self walkerPath: (self patch
+				 wayTo: self walkerDestination
+				 constraint: [ :cell | 
+				 cell type = 'Beach' or: [ cell sealRestingPlace = 'Home' ] ]) ].
+	
+	self walkerPath remove: self patch
 ]
 
 { #category : #behavior }
@@ -126,6 +136,20 @@ BSWalkerAlone >> moveToDestination [
 
 self previousCell: self patch.
 self moveInDirectionOf: walkerDestination constraintOnPath: [ :cell | cell type = 'Land' or: [ cell type = 'Home' ] ]
+]
+
+{ #category : #behavior }
+BSWalkerAlone >> moveWalking [
+
+	| candidates |
+	(self walkerAction = 'Out') ifTrue: [ ^ self ].
+	
+	candidates := (self patch neighbourhood select: [ :cell | 
+		               cell = self walkerPath first ]) first.
+
+	self moveTo: candidates.
+	self patch stomping: self patch stomping + self groupSize.
+	self walkerPath remove: candidates
 ]
 
 { #category : #pov }

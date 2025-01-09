@@ -3,13 +3,14 @@ Class {
 	#superclass : #CMSpatialEntityElement,
 	#instVars : [
 		'type',
+		'stomping',
 		'accessRule',
 		'kayakWay',
 		'boatWay',
 		'sealRestingPlace',
-		'walkerObservatory',
 		'threatLevel',
-		'numberOfWalker'
+		'numberOfWalker',
+		'way'
 	],
 	#category : #'Baie de Somme-Model'
 }
@@ -76,12 +77,13 @@ self threatLevel: (arg1 + arg2).
 ]
 
 { #category : #initialization }
-BSHabitatCell >> initialize [ 
-	
+BSHabitatCell >> initialize [
+
 	super initialize.
-	
+
 	self threatLevel: 0.
 	self numberOfWalker: 0.
+	self stomping: 0.
 ]
 
 { #category : #initialization }
@@ -121,10 +123,6 @@ BSHabitatCell >> povAccessRule [
 
 		self accessRule  = 'Sea' ifTrue: [ ^ Color blue ].
 		self accessRule  = 'Land' ifTrue: [ ^ Color yellow ].
-		self accessRule  = 'Walker Home' ifTrue: [ ^ Color red ].
-		self accessRule  = 'Kayak Home' ifTrue: [ ^ Color green ].
-		self accessRule  = 'Boat Home' ifTrue: [ ^ Color purple ].
-		self accessRule  = 'Kayak Objective' ifTrue: [ ^ Color cyan ].
 ]
 
 { #category : #pov }
@@ -155,6 +153,8 @@ BSHabitatCell >> povHabitatType [
 	
 	self type = 'Schorre' ifTrue: [ ^ Color green ].
 	
+	self type = 'Sand' ifTrue: [ ^ Color orange ].
+	
 	self type = 'Beach' ifTrue: [ ^ Color yellow ].
 	
 	self type = 'City' ifTrue: [ ^ Color black ].
@@ -168,16 +168,6 @@ BSHabitatCell >> povKayakWay [
 	self kayakWay  = 'Not' ifTrue: [ ^ Color black  ].
 	self kayakWay  = 'Sea' ifTrue: [ ^ Color blue  ].
 	self kayakWay  = 'Land' ifTrue: [ ^ Color yellow  ].
-]
-
-{ #category : #pov }
-BSHabitatCell >> povLegalStatus [
-
-	self accessRule = 'By Sea' ifTrue: [ ^ Color blue ].
-	
-	self accessRule = 'By Land' ifTrue: [ ^ Color yellow ].
-	
-		 
 ]
 
 { #category : #pov }
@@ -207,6 +197,19 @@ BSHabitatCell >> povRestingPlace [
 	self sealRestingPlace  = 'Empty' ifTrue: [ ^ Color black ].
 	self sealRestingPlace  = 'Land' ifTrue: [ ^ Color brown ].
 	self sealRestingPlace  = 'Sea' ifTrue: [ ^ Color black ].
+	self sealRestingPlace = 'Home' ifTrue: [ ^ Color black ].
+]
+
+{ #category : #pov }
+BSHabitatCell >> povWays [
+
+		self way  = 'Sea' ifTrue: [ ^ Color blue ].
+		self way  = 'Land' ifTrue: [ ^ Color yellow ].
+		self way  = 'Maye' ifTrue: [ ^ Color red ].
+		self way  = 'Crotoy' ifTrue: [ ^ Color red ].
+		self way  = 'Hourdel' ifTrue: [ ^ Color red ].
+		self way  = 'Hourdel Promenade' ifTrue: [ ^ Color cyan ].
+		self way  = 'Molliere' ifTrue: [ ^ Color cyan ].
 ]
 
 { #category : #accessing }
@@ -226,6 +229,18 @@ BSHabitatCell >> step [
 
 (self type = 'Land')
 ifTrue: [self defineThreatLevelLand].
+]
+
+{ #category : #accessing }
+BSHabitatCell >> stomping [
+
+	^ stomping
+]
+
+{ #category : #accessing }
+BSHabitatCell >> stomping: anObject [
+
+	stomping := anObject
 ]
 
 { #category : #accessing }
@@ -250,4 +265,16 @@ BSHabitatCell >> type [
 BSHabitatCell >> type: anObject [
 
 	type := anObject
+]
+
+{ #category : #accessing }
+BSHabitatCell >> way [
+
+	^ way
+]
+
+{ #category : #accessing }
+BSHabitatCell >> way: anObject [
+
+	way := anObject
 ]

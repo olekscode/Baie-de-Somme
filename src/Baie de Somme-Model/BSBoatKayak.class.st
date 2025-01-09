@@ -87,9 +87,10 @@ BSBoatKayak >> kayakMoveInWater [
 		^ self
 			  moveTowards: boatDirection
 			  constraintOnPath: [ :cell | cell type = 'Sea' ] ].
-	"S'il a atteint son objectif, il décide de rentrer"
+	"S'il a atteint son objectif, il avance vers sa prochaine étape"
 	(self patch = self boatDestination) ifTrue: [ 
-		self boatDestination: self home ].
+		self boatDestination: self way first.
+		self way remove: self boatDestination ].
 	"Il avance vers son objectif en suivant son chemin"
 	self
 		moveTowards: self boatDestination
@@ -161,32 +162,30 @@ self moveTo: candidatePatch atRandom.
 { #category : #pov }
 BSBoatKayak >> pov [
 
+	self boatAction = 'Out' ifTrue: [ ^ Color blue ].
+
 	^ Color pink
 ]
 
 { #category : #stepping }
 BSBoatKayak >> step [
 
-((self patch = home) & (self energy = 0)) ifTrue: [ ^ self ].
-"Au début de chaque tour on définit ce que voit le bateau"
-self defineVision.
-self lookForSeals.
-"Si le kayak voit des phoques il gagne de la satisfaction"
-(self siteWithSeal isNotEmpty) ifTrue: [ satisfaction := satisfaction +1 ].
-(self patch hasOccupantsOfClass: BSSeal) ifTrue: [ satisfaction := satisfaction + 1 ].
+	self patch = home & (self energy = 0) ifTrue: [ ^ self boatAction: 'Out' ].
+	"Au début de chaque tour on définit ce que voit le bateau"
+	self defineVision.
+	self lookForSeals.
 
-"Ensuite le kayak entre dans la méthode propre à l'action qu'il est en train de faire"
-(self boatAction = 'Navigate') ifTrue: [ self stepNavigation ].
+	"Ensuite le kayak entre dans la méthode propre à l'action qu'il est en train de faire"
+	self boatAction = 'Navigate' ifTrue: [ self stepNavigation ].
 
-(self boatAction = 'Repository') ifTrue: [ self stepRepository ].
+	self boatAction = 'Repository' ifTrue: [ self stepRepository ].
 
-(self boatAction = 'Observation') ifTrue: [ self stepObservation ].
+	self boatAction = 'Observation' ifTrue: [ self stepObservation ].
 
-(self boatAction = 'On Land') ifTrue: [ self stepOnLandBoat ].
+	self boatAction = 'On Land' ifTrue: [ self stepOnLandBoat ].
 
-"A la fin du tour son énergie diminue"
-(self energy > 0) ifTrue: [ energy := energy - 1 ].
-
+	"A la fin du tour son énergie diminue"
+	self energy > 0 ifTrue: [ energy := energy - 1 ]
 ]
 
 { #category : #stepping }

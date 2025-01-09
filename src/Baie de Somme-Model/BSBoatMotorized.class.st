@@ -50,7 +50,7 @@ target := self boatDestination first.
 
 (self patch = target) ifTrue: [ ^ self changeActionToObservation ].
 
-self moveTowards: target constraintOnPath: [ :cell | cell boatWay ~= 'Sea' and: [cell boatWay ~= 'Land'] ].
-self moveTowards: target constraintOnPath: [ :cell | cell boatWay ~= 'Sea' and: [cell boatWay ~= 'Land'] ].
-self moveTowards: target constraintOnPath: [ :cell | cell boatWay ~= 'Sea' and: [cell boatWay ~= 'Land'] ].
+self moveTowards: target constraintOnPath: [ :cell | cell accessRule = 'Sea' ].
+self moveTowards: target constraintOnPath: [ :cell | cell accessRule = 'Sea' ].
+self moveTowards: target constraintOnPath: [ :cell | cell accessRule = 'Sea' ].
 ]

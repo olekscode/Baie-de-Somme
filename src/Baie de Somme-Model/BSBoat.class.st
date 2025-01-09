@@ -15,7 +15,8 @@ Class {
 		'actionCount',
 		'sealAwareness',
 		'wayMemory',
-		'restingPlaceMemory'
+		'restingPlaceMemory',
+		'way'
 	],
 	#category : #'Baie de Somme-Model'
 }
@@ -75,10 +76,10 @@ BSBoat >> defineVision [
 	scope1 := OrderedCollection new.
 	scope2 := OrderedCollection new.
 	scope1 := patch neighbourhoodAndSelf.
-	scope2 := scope1.
+	scope2 := scope1 asOrderedCollection.
 	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
 	scope2 removeDuplicates.
-	scope2 := scope1.
+	scope1 := scope2.
 	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
 	scope2 removeDuplicates.
 	self sight: scope2.
@@ -133,7 +134,10 @@ BSBoat >> initialize [
 BSBoat >> lookForSeals [
 
 self siteWithSeal: (self sight select: [ :cell | ((cell hasOccupantsOfClass: BSSeal) & (cell type = 'Beach'))]).
-	
+
+"Si le kayak voit des phoques il gagne de la satisfaction"
+(self siteWithSeal isNotEmpty) ifTrue: [ satisfaction := satisfaction +1 ].
+(self patch hasOccupantsOfClass: BSSeal) ifTrue: [ satisfaction := satisfaction + 1 ].
 ]
 
 { #category : #moving }
@@ -238,6 +242,18 @@ self subclassResponsibility.
 
 
 	
+]
+
+{ #category : #accessing }
+BSBoat >> way [
+
+	^ way
+]
+
+{ #category : #accessing }
+BSBoat >> way: anObject [
+
+	way := anObject
 ]
 
 { #category : #accessing }

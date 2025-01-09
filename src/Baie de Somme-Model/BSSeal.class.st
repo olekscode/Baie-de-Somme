@@ -42,19 +42,6 @@ BSSeal >> alertLevel: anObject [
 ]
 
 { #category : #behavior }
-BSSeal >> alertRepository [
-
-| friends |
-friends := OrderedCollection new.
-
-self myRestingPlace do: [ :cell | (cell hasOccupantsOfClass: self class) 
-	ifTrue: [ cell theOccupants do: [ :each | each do: [ :each2 | friends add: each2 ] ] ] ].
-
-friends isEmpty ifTrue: [ ^self ].
-friends do: [ :seal | self giveAlertTo: seal ].
-]
-
-{ #category : #behavior }
 BSSeal >> changeActionToCheckRepository [
 
 self currentStatus: 'Check repository'.
@@ -68,10 +55,11 @@ BSSeal >> changeActionToResting [
 self currentStatus: 'Resting'.
 self actionCount: 0.
 
-(self patch sealRestingPlace = self restingPlace) ifTrue: [ self myRestingPlace: self patch ].
+(self patch sealRestingPlace = self restingPlace name) ifTrue: [ self myRestingPlace: self patch ].
 
 (self patch type = 'Sea') ifTrue: [ self moveTo: self myRestingPlace ].
 
+self restingPlace addSeal: self.
 self stepResting.
 ]
 
@@ -102,10 +90,10 @@ BSSeal >> defineVision [
 	scope1 := OrderedCollection new.
 	scope2 := OrderedCollection new.
 	scope1 := patch neighbourhoodAndSelf.
-	scope2 := scope1.
+	scope2 := scope1 asOrderedCollection.
 	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
 	scope2 removeDuplicates.
-	scope2 := scope1.
+	scope1 := scope2.
 	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
 	scope2 removeDuplicates.
 	self sight: scope2.
@@ -125,11 +113,8 @@ BSSeal >> disturbanceCount: anObject [
 
 { #category : #behavior }
 BSSeal >> escapeInSea [
-"S'il y a un danger (promeneur ou bateau) trop près, les phoques préviennent leurs congénères et s'échappent à l'eau"
-| candidatePatch occupiedRestingPlaces|
-"Donner l'alerte:"
-occupiedRestingPlaces := self sight select: [ :cell | ((cell hasOccupantsOfClass: self class) & (cell sealRestingPlace = self patch sealRestingPlace )) ].
-occupiedRestingPlaces do: [ :cell | cell theOccupants do: [ :occupantTable | occupantTable do: [ :seal | (seal class = self class) ifTrue: [ self giveAlertTo: seal ] ] ] ].
+
+| candidatePatch |
 
 "S'échapper à l'eau"
 candidatePatch := self patch neighbourhood select: [ :cell | cell type = 'Sea'  ].
@@ -138,9 +123,10 @@ self changeActionToSwimming.
 ]
 
 { #category : #behavior }
-BSSeal >> giveAlertTo: seal [
+BSSeal >> giveAlert [
 
-seal isAlerted.
+"Donner l'alerte:"
+self restingPlace isAlarmed
 ]
 
 { #category : #initialization }
@@ -157,6 +143,8 @@ BSSeal >> initialize [
 BSSeal >> isAlerted [
 
 self alertLevel: 1.
+
+self restingPlace interactionOnGoing: true.
 ]
 
 { #category : #accessing }
@@ -201,8 +189,13 @@ securityLevel := 0.
 { #category : #behavior }
 BSSeal >> monitorSurroundingsOnRepository [
 
+(self sight anySatisfy: [ :cell | (cell hasOccupantsOfClass: BSWalker) or: [ cell hasOccupantsOfClass: BSBoat ] ])
+	ifTrue: [ self alertLevel: 1.
+		self restingPlace isAlerted ].
+	
+"S'il y a un danger (promeneur ou bateau) trop près, les phoques préviennent leurs congénères et s'échappent à l'eau"
 (self patch neighbourhood anySatisfy: [ :cell | (cell hasOccupantsOfClass: BSWalker) or: [ cell hasOccupantsOfClass: BSBoat ] ])
-	ifTrue: [ ^ self escapeInSea ].
+	ifTrue: [ ^ self giveAlert ].
 	
 self alertLevel: 0.
 ]
@@ -215,7 +208,7 @@ BSSeal >> moveAroundRepository [
 		              cell type = 'Sea' ].
 	candidates := candidates select: [ :cell | 
 		              cell neighbourhood anySatisfy: [ :cell2 | 
-			              cell2 sealRestingPlace = self restingPlace ] ].
+			              cell2 sealRestingPlace = self restingPlace name ] ].
 	
 candidates ifEmpty: [ ^ self changeActionToSwimming ] ifNotEmpty: [ self moveTo: candidates atRandom ].
 ]
@@ -284,7 +277,10 @@ self moveTowards: myRestingPlace constraintOnPath: [ :cell | cell type = 'Sea' o
 { #category : #behavior }
 BSSeal >> moveTowardRepository [
 
-self moveTowards: myRestingPlace constraintOnPath: [ :cell | (cell type = 'Sea') or: [ cell sealRestingPlace = self restingPlace ]].
+(self patch neighbourhood anySatisfy: [:cell | cell sealRestingPlace = self restingPlace name ])
+		ifTrue: [ ^ self changeActionToCheckRepository ].
+
+self moveTowards: myRestingPlace constraintOnPath: [ :cell | (cell type = 'Sea') or: [ cell sealRestingPlace = self restingPlace name ]].
 ]
 
 { #category : #accessing }
@@ -354,7 +350,7 @@ BSSeal >> sight: anObject [
 	sight := anObject
 ]
 
-{ #category : #stepping }
+{ #category : #control }
 BSSeal >> step [
 self defineVision.
 "Cette méthode permet de déterminer l'action du phoque, s'il est sur un reposoir c'est qu'il se repose. Dans l'eau il peu soit nager, soit se diriger vers son reposoir."	
@@ -363,13 +359,14 @@ self defineVision.
 	(self currentStatus = 'Resting') ifTrue: [ ^ self stepResting ].
 	(self currentStatus = 'Swimming') ifTrue: [ ^ self stepSwimming ].
 	(self currentStatus = 'Check repository') ifTrue: [ ^ self stepCheckRepository ].
+	(self currentStatus = 'Alarmed') ifTrue: [ ^ self escapeInSea ]
 ]
 
 { #category : #stepping }
 BSSeal >> stepCheckRepository [
 "Cette méthode vise à modéliser le comportement d'un phoque qui arrête de nager pour retourner se reposer sur son reposoir"
 "Un contrôle pour vérifier que le phoque n'est pas déjà sur son reposoir auquel cas on arrête là"
-(self patch sealRestingPlace = self restingPlace) ifTrue: [ ^ self changeActionToResting ].
+(self patch sealRestingPlace = self restingPlace name ) ifTrue: [ ^ self changeActionToResting ].
 "Si cela fait trop longtemps qu'il attend, il retourne nager, il est dérangé"
 (self actionCount = 0) ifTrue: [ ^ self changeActionToSwimming ].
 
@@ -381,7 +378,7 @@ BSSeal >> stepCheckRepository [
 		"Sinon le phoque attend près de son reposoir"
 		]
 	"S'il n'est pas à côté de son reposoir il avance vers lui"
-	ifFalse: [ self moveTowardRepository ].
+	ifFalse: [ self moveTowards: myRestingPlace constraintOnPath: [ :cell | (cell type = 'Sea') or: [ cell sealRestingPlace = self restingPlace name ]]. ].
 
 (self actionCount > 0) ifTrue: [ actionCount := actionCount - 1 ].
 
@@ -391,9 +388,8 @@ BSSeal >> stepCheckRepository [
 { #category : #stepping }
 BSSeal >> stepResting [
 
-(self alertLevel < 1) 
-	ifTrue: [self monitorSurroundingsOnRepository]
-	ifFalse: [ self escapeInSea ].
+self monitorSurroundingsOnRepository.
+
 ]
 
 { #category : #stepping }
@@ -408,10 +404,7 @@ BSSeal >> stepSealStart [
 BSSeal >> stepSwimming [
 
 (self actionCount = 0)
-	ifTrue: [ (self patch neighbourhood anySatisfy: [:cell | cell sealRestingPlace = self restingPlace ])
-		ifTrue: [ ^ self changeActionToCheckRepository ]
-		ifFalse: [ ^ self moveTowardRepository ]
-	].
+	ifTrue: [ ^ self moveTowardRepository ].
 
 self moveInWater.
 

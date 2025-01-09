@@ -5,31 +5,91 @@ Class {
 	#classTraits : 'TCMLocated classTrait',
 	#instVars : [
 		'home',
+		'way',
 		'satisfaction',
 		'energy',
+		'previousCell',
 		'sight',
+		'walkerAction',
 		'sealExpectation',
 		'groupSize',
 		'siteWithSeal',
 		'walkerDestination',
-		'previousCell',
+		'walkerPath',
 		'sealAwareness',
-		'withDog',
+		'actionCount',
 		'withBinoculars'
 	],
 	#category : #'Baie de Somme-Model'
 }
 
+{ #category : #accessing }
+BSWalker >> actionCount [
+
+	^ actionCount
+]
+
+{ #category : #accessing }
+BSWalker >> actionCount: anObject [
+
+	actionCount := anObject
+]
+
+{ #category : #behavior }
+BSWalker >> changeActionToEnded [
+
+self walkerAction: 'Ended'.
+]
+
+{ #category : #behavior }
+BSWalker >> changeActionToObservation [ 
+
+self walkerAction: 'Observation'.
+
+self siteWithSeal ifEmpty: [ self actionCount: (Cormas random * 10 + 10) rounded ]
+ ifNotEmpty: [ self actionCount: (Cormas random * 10 + 20) rounded ].
+
+
+]
+
+{ #category : #behavior }
+BSWalker >> changeActionToWalking [
+
+self walkerAction: 'Walking'.
+
+self way 
+ifEmpty: [ ^ self changeActionToEnded ] 
+ifNotEmpty: [ self defineDestination.].
+	
+self actionCount: 1.
+]
+
 { #category : #behavior }
 BSWalker >> checkPosition [
 
-	self subclassResponsibility
+self subclassResponsibility.
+]
+
+{ #category : #behavior }
+BSWalker >> defineDestination [ 
+
+self subclassResponsibility.
 ]
 
 { #category : #behavior }
 BSWalker >> defineVision [
 
-	self subclassResponsibility
+|scope1 scope2|
+	scope1 := OrderedCollection new.
+	scope2 := OrderedCollection new.
+	scope1 := patch neighbourhoodAndSelf.
+	scope2 := scope1 asOrderedCollection.
+	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
+	scope2 removeDuplicates.
+	scope1 := scope2.
+	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
+	scope2 removeDuplicates.
+	self sight: scope2.
 ]
 
 { #category : #accessing }
@@ -78,10 +138,18 @@ BSWalker >> home: anObject [
 { #category : #initialization }
 BSWalker >> initialize [ 
 
+	| arg |
+	
 	super initialize.
 	satisfaction := 0.
-	energy := (Cormas random * 100) rounded.
+	
 	siteWithSeal := OrderedCollection new. 
+	self walkerAction: 'Starting'.
+	
+	arg:= Cormas random.
+	(arg < 0.5) 
+		ifTrue: [ self sealAwareness: 1 ] 
+		ifFalse: [ self sealAwareness: 0].
 ]
 
 { #category : #printing }
@@ -104,7 +172,7 @@ BSWalker >> lookAtSeals [
 { #category : #behavior }
 BSWalker >> lookAtSealsAware [
 
-| numberOfWalkers|
+"| numberOfWalkers|
 numberOfWalkers := 0.
 	
 self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + walker groupSize ].
@@ -112,28 +180,30 @@ self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + wal
 (numberOfWalkers < (self groupSize + 1)) 
 	ifTrue: [ satisfaction := satisfaction + 2 ]
 	ifFalse: [ satisfaction := satisfaction + 1 ].
-	self walkerDestination: self patch.
+	self walkerDestination: self patch."
 ]
 
 { #category : #behavior }
 BSWalker >> lookAtSealsNotAware [
 
-| numberOfWalkers|
-numberOfWalkers := 0.
+"Quel est le timing de l'action?"
+(self actionCount \\ 2 = 0) ifFalse: [ ^ self ].
+
+"On contrôle si le promeneur voit toujours des phoques sur le reposoir"
+(self siteWithSeal)
+	ifNotEmpty: [ self moveTowards: (self siteWithSeal atRandom) constraintOnPath: [ :cell | cell accessRule = 'Land' ] ] "S'il voit des phoques il se rapproche"
+	ifEmpty: [ self moveOnRepository ]. "S'ile ne voit pas de phoque il bouge sur le reposoir"
 	
-self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + walker groupSize ].
-	
-(numberOfWalkers < (self groupSize + 1)) 
-	ifTrue: [ satisfaction := satisfaction + 1 ]
-	"ifFalse: [ satisfaction := satisfaction + 1 ]".
-self setDestinationToSeal.
+self actionCount: self actionCount - 1.
 ]
 
 { #category : #behavior }
 BSWalker >> lookForSeals [
 
 self siteWithSeal: (self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell type = 'Land') ]).
-	
+
+"Si le promeneur voit des phoques il gagne de la satisfaction"
+(self siteWithSeal isNotEmpty) ifTrue: [ satisfaction := satisfaction +1 ].
 ]
 
 { #category : #behavior }
@@ -165,6 +235,23 @@ Example: self moveTowards: self house patch constraintOnPath: [:c | c isClosed n
 ]
 
 { #category : #behavior }
+BSWalker >> moveOnRepository [
+
+| candidates |
+
+candidates := self patch neighbourhood select: [ :cell | 
+	cell neighbourhoodAndSelf anySatisfy: [ :each | 
+		each type = 'Sea' ] ].
+
+candidates := candidates select: [ :cell |
+	cell accessRule = 'Land' ].
+
+candidates 
+	ifEmpty: [ self randomWalkConstrainedBy: [ :cell | cell accessRule = 'Land' ] ] 
+	ifNotEmpty: [ self moveTo: candidates atRandom ]
+]
+
+{ #category : #behavior }
 BSWalker >> moveToASeal [
 
 	
@@ -172,6 +259,12 @@ BSWalker >> moveToASeal [
 
 { #category : #behavior }
 BSWalker >> moveToDestination [
+]
+
+{ #category : #behavior }
+BSWalker >> moveWalking [
+
+self subclassResponsibility.
 ]
 
 { #category : #pov }
@@ -277,20 +370,83 @@ BSWalker >> siteWithSeal: anObject [
 	^ siteWithSeal := anObject
 ]
 
-{ #category : #stepping }
+{ #category : #control }
 BSWalker >> step [
+	(self walkerAction = 'Out') ifTrue: [ ^ self].
 
-	self checkPosition.
+	self defineVision.
+	self lookForSeals.
+
+	"Ensuite le promeneur entre dans la méthode propre à l'action qu'il est en train de faire"	
+	self walkerAction = 'Walking' ifTrue: [ ^ self stepWalking ].
+
+	self walkerAction = 'Starting' ifTrue: [ ^ self stepStarting ].
+
+	self walkerAction = 'Observation' ifTrue: [ ^ self stepObservation ]
+
+	"self checkPosition.
 	(energy = 0) ifTrue: [ ^ self goBackHome ].
 	(self siteWithSeal isNotEmpty) 
 	ifTrue: [ self lookAtSeals ]
 	ifFalse: [ self lookForSpot ].
 	self moveToDestination.
 	self defineVision.
-	self lookForSeals.
-	
+	self lookForSeals."
+]
 
+{ #category : #control }
+BSWalker >> stepObservation [
 
+	"Si le kayak a épuisé son temps d'observation il retourne sur son parcours"
+
+	(self actionCount = 0) ifTrue: [ ^ self changeActionToWalking ].
+
+	"En fonction de sa connaissance de ce qu'il faut faire, le promeneur peut avoir deux sortes de comportements"
+	(self sealAwareness = 0)
+		ifTrue: [ "Regarder les phoques en restant à bonne distance" 
+			^ self lookAtSealsAware ]
+		ifFalse: [ self lookAtSealsNotAware ]. "S'approcher du reposoir pour voir les phoques de plus près"
+
+	self actionCount: self actionCount - 1
+]
+
+{ #category : #control }
+BSWalker >> stepStarting [
+
+"Cette méthode permet au promeneur de définir sa destination à partir de son point de départ"
+self defineDestination.
+
+self changeActionToWalking.
+
+]
+
+{ #category : #control }
+BSWalker >> stepWalking [
+
+"Cette méthode définit le comportement du promeneur guidé en train de faire sa ballade et de regarder s'il voit des phoques."
+(self actionCount < 1) ifTrue: [ ^ self actionCount: 1 ].
+
+"Il contrôle sa position"
+self checkPosition.
+
+"Il se déplace"		
+(self walkerAction = 'Observation') ifTrue: [ ^ self ].
+self moveWalking.
+
+self actionCount: 0.
+
+]
+
+{ #category : #accessing }
+BSWalker >> walkerAction [
+
+	^ walkerAction
+]
+
+{ #category : #accessing }
+BSWalker >> walkerAction: anObject [
+
+	walkerAction := anObject
 ]
 
 { #category : #accessing }
@@ -306,6 +462,30 @@ BSWalker >> walkerDestination: anObject [
 ]
 
 { #category : #accessing }
+BSWalker >> walkerPath [
+
+	^ walkerPath
+]
+
+{ #category : #accessing }
+BSWalker >> walkerPath: anObject [
+
+	walkerPath := anObject
+]
+
+{ #category : #accessing }
+BSWalker >> way [
+
+	^ way
+]
+
+{ #category : #accessing }
+BSWalker >> way: anObject [
+
+	way := anObject
+]
+
+{ #category : #accessing }
 BSWalker >> withBinoculars [
 
 	^ withBinoculars
@@ -315,16 +495,4 @@ BSWalker >> withBinoculars [
 BSWalker >> withBinoculars: anObject [
 
 	withBinoculars := anObject
-]
-
-{ #category : #accessing }
-BSWalker >> withDog [
-
-	^ withDog
-]
-
-{ #category : #accessing }
-BSWalker >> withDog: anObject [
-
-	withDog := anObject
 ]

@@ -16,30 +16,20 @@ BSWalkerGuide class >> entityName [
 { #category : #behavior }
 BSWalkerGuide >> checkPosition [
 
-(self patch sealRestingPlace = 'Observatory')
-	ifTrue: [ ((self observatoryMemory select: [:x|x = self patch]) isNotEmpty)
-		ifTrue: [  
-			self observatoryMemory remove: self patch].
-	].
+	self patch = self walkerDestination ifFalse: [ ^ self ].
+	(self way select: [ :x | x = self patch ]) ifNotEmpty: [ 
+		self way remove: self patch.
+		^ self changeActionToObservation ]
 ]
 
 { #category : #'as yet unclassified' }
-BSWalkerGuide >> defineVision [
+BSWalkerGuide >> defineDestination [
 
-|scope1 scope2|
-	scope1 := OrderedCollection new.
-	scope2 := OrderedCollection new.
-	scope1 := patch neighbourhoodAndSelf.
-	scope2 := scope1.
-	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
-	scope2 removeDuplicates.
-	scope1 := scope2.
-	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
-	scope2 removeDuplicates.
-	scope1 := scope2.
-	scope1 do: [ :cell | scope2 addAll: cell neighbourhoodAndSelf ].
-	scope2 removeDuplicates.
-	self sight: scope2.
+self walkerDestination: self way first.
+
+self walkerPath: (self patch wayTo: (self walkerDestination) constraint: [ :cell | cell accessRule = 'Land' ]).
+
+self walkerPath remove: self patch.
 ]
 
 { #category : #initialization }
@@ -113,6 +103,18 @@ energy := energy - 1.
 
 ]
 
+{ #category : #behavior }
+BSWalkerGuide >> moveWalking [
+
+	| candidates |
+	candidates := (self patch neighbourhood select: [ :cell | 
+		               cell = self walkerPath first ]) first.
+
+	self moveTo: candidates.
+	self patch stomping: self patch stomping + self groupSize.
+	self walkerPath remove: candidates
+]
+
 { #category : #accessing }
 BSWalkerGuide >> observatoryMemory [
 
@@ -128,7 +130,7 @@ BSWalkerGuide >> observatoryMemory: anObject [
 { #category : #pov }
 BSWalkerGuide >> pov [
 
-	^ Color green  
+	^ Color blue
 ]
 
 { #category : #pov }
