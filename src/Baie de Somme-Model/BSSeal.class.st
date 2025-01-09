@@ -1,6 +1,6 @@
 Class {
-	#name : #BSSeal,
-	#superclass : #CMAgent,
+	#name : 'BSSeal',
+	#superclass : 'CMAgent',
 	#traits : 'TCMLocated',
 	#classTraits : 'TCMLocated classTrait',
 	#instVars : [
@@ -14,42 +14,43 @@ Class {
 		'disturbanceCount',
 		'lastPlace'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> actionCount [
 
 	^ actionCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> actionCount: anObject [
 
 	actionCount := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> alertLevel [
 
 	^ alertLevel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> alertLevel: anObject [
 
 	alertLevel := anObject
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> changeActionToCheckRepository [
 
 self currentStatus: 'Check repository'.
-self actionCount: (Cormas random * 10 + 5) rounded.
+self actionCount: (Random new next * 10 + 5) rounded.
 self stepCheckRepository.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> changeActionToResting [
 
 self currentStatus: 'Resting'.
@@ -63,27 +64,27 @@ self restingPlace addSeal: self.
 self stepResting.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> changeActionToSwimming [
 
 self currentStatus: 'Swimming'.
-self actionCount: (Cormas random * 10 + 15) rounded.
+self actionCount: (Random new next * 10 + 15) rounded.
 disturbanceCount := disturbanceCount + 1.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> currentStatus [
 
 	^ currentStatus 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> currentStatus: anObject [
 
 	currentStatus := anObject
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> defineVision [
 
 |scope1 scope2|
@@ -99,19 +100,19 @@ BSSeal >> defineVision [
 	self sight: scope2.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> disturbanceCount [
 
 	^ disturbanceCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> disturbanceCount: anObject [
 
 	disturbanceCount := anObject
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> escapeInSea [
 
 | candidatePatch |
@@ -122,14 +123,14 @@ self moveTo: candidatePatch atRandom.
 self changeActionToSwimming.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> giveAlert [
 
 "Donner l'alerte:"
 self restingPlace isAlarmed
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSSeal >> initialize [
 
 	super initialize.
@@ -139,7 +140,7 @@ BSSeal >> initialize [
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> isAlerted [
 
 self alertLevel: 1.
@@ -147,19 +148,19 @@ self alertLevel: 1.
 self restingPlace interactionOnGoing: true.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> lastPlace [
 
 	^ lastPlace
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> lastPlace: anObject [
 
 	lastPlace := anObject
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> monitorLand [
 
 | number dist|
@@ -174,7 +175,7 @@ number := 0.
 	ifFalse: [ ^ false ].
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> monitorRepository [
 
 | securityLevel |
@@ -186,7 +187,7 @@ securityLevel := 0.
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> monitorSurroundingsOnRepository [
 
 (self sight anySatisfy: [ :cell | (cell hasOccupantsOfClass: BSWalker) or: [ cell hasOccupantsOfClass: BSBoat ] ])
@@ -200,7 +201,7 @@ BSSeal >> monitorSurroundingsOnRepository [
 self alertLevel: 0.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> moveAroundRepository [
 
 	| candidates |
@@ -213,7 +214,7 @@ BSSeal >> moveAroundRepository [
 candidates ifEmpty: [ ^ self changeActionToSwimming ] ifNotEmpty: [ self moveTo: candidates atRandom ].
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> moveAwayFromThreat [
 
 |candidates|
@@ -229,7 +230,7 @@ self moveTo: (candidates atRandom).
 self alertLevel: 0.
 ]
 
-{ #category : #moving }
+{ #category : 'moving' }
 BSSeal >> moveInDirectionOf: aCell constraintOnPath: aBlock [
 	"Purpose: moves one cell in direction of a given location, taking a specified constraint on each cell of the path to destination.
 Argument: aCell = <SpatialEntityElement>
@@ -250,7 +251,7 @@ Example: self moveTowards: self house patch constraintOnPath: [:c | c isClosed n
 			candidate isNotEmpty ifTrue: [ self moveTo: candidate atRandom ]] ]
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> moveInWater [
 
 | candidates elicitedCandidate |
@@ -266,7 +267,7 @@ self moveTo: candidates atRandom.
 self actionCount: actionCount - 1.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> moveToRestingPlace [
 
 self moveTowards: myRestingPlace constraintOnPath: [ :cell | cell type = 'Sea' or: [ cell = self myRestingPlace ] ]
@@ -274,7 +275,7 @@ self moveTowards: myRestingPlace constraintOnPath: [ :cell | cell type = 'Sea' o
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSSeal >> moveTowardRepository [
 
 (self patch neighbourhood anySatisfy: [:cell | cell sealRestingPlace = self restingPlace name ])
@@ -283,19 +284,19 @@ BSSeal >> moveTowardRepository [
 self moveTowards: myRestingPlace constraintOnPath: [ :cell | (cell type = 'Sea') or: [ cell sealRestingPlace = self restingPlace name ]].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> myRestingPlace [
 
 	^ myRestingPlace
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> myRestingPlace: anObject [
 
 	myRestingPlace := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSSeal >> playWithBoat [
 
 | candidates|
@@ -308,49 +309,51 @@ self moveTowards: (candidates atRandom) constraintOnPath: [ :cell | cell type = 
 self curiosity: self curiosity - 1.
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSSeal >> pov [
-
-	^ Color black 
+	<pov>
+	
+	^ CMPointOfView color: Color black size: 0.7
+	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> restingPlace [
 
 	^ restingPlace
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> restingPlace: anObject [
 
 	restingPlace := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> restingPlaceMemory [
 
 	^ restingPlaceMemory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> restingPlaceMemory: anObject [
 
 	restingPlaceMemory := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> sight [
 
 	^ sight
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSSeal >> sight: anObject [
 
 	sight := anObject
 ]
 
-{ #category : #control }
+{ #category : 'control' }
 BSSeal >> step [
 self defineVision.
 "Cette méthode permet de déterminer l'action du phoque, s'il est sur un reposoir c'est qu'il se repose. Dans l'eau il peu soit nager, soit se diriger vers son reposoir."	
@@ -362,7 +365,7 @@ self defineVision.
 	(self currentStatus = 'Alarmed') ifTrue: [ ^ self escapeInSea ]
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSSeal >> stepCheckRepository [
 "Cette méthode vise à modéliser le comportement d'un phoque qui arrête de nager pour retourner se reposer sur son reposoir"
 "Un contrôle pour vérifier que le phoque n'est pas déjà sur son reposoir auquel cas on arrête là"
@@ -385,14 +388,14 @@ BSSeal >> stepCheckRepository [
 
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSSeal >> stepResting [
 
 self monitorSurroundingsOnRepository.
 
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSSeal >> stepSealStart [
 
 (self patch type = 'Beach') ifTrue: [ self changeActionToResting ].
@@ -400,7 +403,7 @@ BSSeal >> stepSealStart [
 (self patch type = 'Sea') ifTrue: [ self changeActionToSwimming ].
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSSeal >> stepSwimming [
 
 (self actionCount = 0)

@@ -1,6 +1,6 @@
 Class {
-	#name : #BSRepository,
-	#superclass : #CMAgent,
+	#name : 'BSRepository',
+	#superclass : 'CMAgent',
 	#instVars : [
 		'name',
 		'cell',
@@ -10,64 +10,65 @@ Class {
 		'alarmCounter',
 		'interactionOnGoing'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 BSRepository >> addSeal: aSeal [
 
 self theSeals add: aSeal.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> alarmCounter [
 
 	^ alarmCounter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> alarmCounter: anObject [
 
 	alarmCounter := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> alertCounter [
 
 	^ alertCounter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> alertCounter: anObject [
 
 	alertCounter := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> alertLevel [
 
 	^ alertLevel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> alertLevel: anObject [
 
 	alertLevel := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> cell [
 
 	^ cell
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> cell: anObject [
 
 	cell := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSRepository >> initialize [ 
 
 super initialize.
@@ -80,19 +81,19 @@ self alertLevel: 0.
 self theSeals: OrderedCollection new.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> interactionOnGoing [
 
 	^ interactionOnGoing
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> interactionOnGoing: anObject [
 
 	interactionOnGoing := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSRepository >> isAlarmed [
 
 self alarmCounter: self alarmCounter + 1.
@@ -100,25 +101,25 @@ self alarmCounter: self alarmCounter + 1.
 self sealAlarmInteraction.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSRepository >> isAlerted [
 
 self alertLevel: 1.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSRepository >> sealAlarmInteraction [
 
 self theSeals do: [ :each | each escapeInSea ].
@@ -133,13 +134,13 @@ self theSeals do: [ :each | each escapeInSea ].
 		]"
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSRepository >> sealAlertInteraction [
 
 self alertCounter: (self alertCounter + 1).
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSRepository >> step [
 
 interactionOnGoing ifTrue: [ 
@@ -151,13 +152,13 @@ interactionOnGoing ifTrue: [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> theSeals [
 
 	^ theSeals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSRepository >> theSeals: anObject [
 
 	theSeals := anObject

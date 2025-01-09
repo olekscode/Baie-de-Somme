@@ -1,6 +1,6 @@
 Class {
-	#name : #BSWalker,
-	#superclass : #CMAgent,
+	#name : 'BSWalker',
+	#superclass : 'CMAgent',
 	#traits : 'TCMLocated',
 	#classTraits : 'TCMLocated classTrait',
 	#instVars : [
@@ -20,39 +20,40 @@ Class {
 		'actionCount',
 		'withBinoculars'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> actionCount [
 
 	^ actionCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> actionCount: anObject [
 
 	actionCount := anObject
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> changeActionToEnded [
 
 self walkerAction: 'Ended'.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> changeActionToObservation [ 
 
 self walkerAction: 'Observation'.
 
-self siteWithSeal ifEmpty: [ self actionCount: (Cormas random * 10 + 10) rounded ]
- ifNotEmpty: [ self actionCount: (Cormas random * 10 + 20) rounded ].
+self siteWithSeal ifEmpty: [ self actionCount: (Random new next * 10 + 10) rounded ]
+ ifNotEmpty: [ self actionCount: (Random new next * 10 + 20) rounded ].
 
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> changeActionToWalking [
 
 self walkerAction: 'Walking'.
@@ -64,19 +65,19 @@ ifNotEmpty: [ self defineDestination.].
 self actionCount: 1.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> checkPosition [
 
 self subclassResponsibility.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> defineDestination [ 
 
 self subclassResponsibility.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> defineVision [
 
 |scope1 scope2|
@@ -92,50 +93,50 @@ BSWalker >> defineVision [
 	self sight: scope2.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> energy [
 
 	^ energy
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> energy: anObject [
 
 	energy := anObject
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> goBackHome [
 	
 	self moveTowards: home constraintOnPath: [ :cell | (cell type = 'Land') or: [cell type = 'Home']].
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> groupSize [
 
 	^ groupSize
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> groupSize: anObject [
 
 	groupSize := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> home [
 
 	^ home
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> home: anObject [
 
 	home := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSWalker >> initialize [ 
 
 	| arg |
@@ -146,13 +147,13 @@ BSWalker >> initialize [
 	siteWithSeal := OrderedCollection new. 
 	self walkerAction: 'Starting'.
 	
-	arg:= Cormas random.
+	arg:= Random new next.
 	(arg < 0.5) 
 		ifTrue: [ self sealAwareness: 1 ] 
 		ifFalse: [ self sealAwareness: 0].
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 BSWalker >> interestingDetails [
 	"Answer a Collection>of interesting receiver's attributes, from a modeler point of view, to display in a popup for example "
 
@@ -161,7 +162,7 @@ BSWalker >> interestingDetails [
 		}
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> lookAtSeals [
 
 (self sealAwareness = 'yes')
@@ -169,7 +170,7 @@ BSWalker >> lookAtSeals [
 	ifFalse: [ ^ self lookAtSealsNotAware ]
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> lookAtSealsAware [
 
 "| numberOfWalkers|
@@ -183,7 +184,7 @@ self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + wal
 	self walkerDestination: self patch."
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> lookAtSealsNotAware [
 
 "Quel est le timing de l'action?"
@@ -197,7 +198,7 @@ BSWalker >> lookAtSealsNotAware [
 self actionCount: self actionCount - 1.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> lookForSeals [
 
 self siteWithSeal: (self sight select: [ :cell | (cell hasOccupantsOfClass: BSSeal) & (cell type = 'Land') ]).
@@ -206,14 +207,14 @@ self siteWithSeal: (self sight select: [ :cell | (cell hasOccupantsOfClass: BSSe
 (self siteWithSeal isNotEmpty) ifTrue: [ satisfaction := satisfaction +1 ].
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> lookForSpot [
 
 	self subclassResponsibility
 
 ]
 
-{ #category : #moving }
+{ #category : 'moving' }
 BSWalker >> moveInDirectionOf: aCell constraintOnPath: aBlock [
 	"Purpose: moves one cell in direction of a given location, taking a specified constraint on each cell of the path to destination.
 Argument: aCell = <SpatialEntityElement>
@@ -234,7 +235,7 @@ Example: self moveTowards: self house patch constraintOnPath: [:c | c isClosed n
 			candidate isNotEmpty ifTrue: [ self moveTo: candidate atRandom ]] ]
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> moveOnRepository [
 
 | candidates |
@@ -251,77 +252,77 @@ candidates
 	ifNotEmpty: [ self moveTo: candidates atRandom ]
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> moveToASeal [
 
 	
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> moveToDestination [
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> moveWalking [
 
 self subclassResponsibility.
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSWalker >> pov [
 
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> previousCell [
 
 	^ previousCell
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> previousCell: anObject [
 
 	previousCell := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> satisfaction [
 
 	^ satisfaction
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> satisfaction: anObject [
 
 	satisfaction := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> sealAwareness [
 
 	^ sealAwareness
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> sealAwareness: anObject [
 
 	sealAwareness := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> sealExpectation [
 
 	^ sealExpectation
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> sealExpectation: anObject [
 
 	sealExpectation := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSWalker >> selectFarthestLandOnWayToSeaFrom: position to: potentialDestination [
 
 | distanceToSpot temporaryDestination finalDestination|
@@ -340,40 +341,43 @@ temporaryDestination do: [ :dest |  ((position distanceTo: dest) >= distanceToSp
 ^finalDestination 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalker >> setDestinationToSeal [
 
 self walkerDestination: self siteWithSeal atRandom.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> sight [
 
 	^ sight
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> sight: anObject [
 
 	sight := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> siteWithSeal [
 
 	^ siteWithSeal
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> siteWithSeal: anObject [
 
 	^ siteWithSeal := anObject
 ]
 
-{ #category : #control }
+{ #category : 'control' }
 BSWalker >> step [
-	(self walkerAction = 'Out') ifTrue: [ ^ self].
+	"Test si le groupe de promenade a fini sa ballade"
+	((self patch = home) & (self energy = 0)) ifTrue: [ ^ self walkerAction: 'Out' ].
+	(self walkerAction = 'Out') ifTrue: [ ^ self ].
 
+	"Définit ce que voit le groupe guidé"
 	self defineVision.
 	self lookForSeals.
 
@@ -383,18 +387,9 @@ BSWalker >> step [
 	self walkerAction = 'Starting' ifTrue: [ ^ self stepStarting ].
 
 	self walkerAction = 'Observation' ifTrue: [ ^ self stepObservation ]
-
-	"self checkPosition.
-	(energy = 0) ifTrue: [ ^ self goBackHome ].
-	(self siteWithSeal isNotEmpty) 
-	ifTrue: [ self lookAtSeals ]
-	ifFalse: [ self lookForSpot ].
-	self moveToDestination.
-	self defineVision.
-	self lookForSeals."
 ]
 
-{ #category : #control }
+{ #category : 'control' }
 BSWalker >> stepObservation [
 
 	"Si le kayak a épuisé son temps d'observation il retourne sur son parcours"
@@ -410,7 +405,7 @@ BSWalker >> stepObservation [
 	self actionCount: self actionCount - 1
 ]
 
-{ #category : #control }
+{ #category : 'control' }
 BSWalker >> stepStarting [
 
 "Cette méthode permet au promeneur de définir sa destination à partir de son point de départ"
@@ -420,7 +415,7 @@ self changeActionToWalking.
 
 ]
 
-{ #category : #control }
+{ #category : 'control' }
 BSWalker >> stepWalking [
 
 "Cette méthode définit le comportement du promeneur guidé en train de faire sa ballade et de regarder s'il voit des phoques."
@@ -428,6 +423,7 @@ BSWalker >> stepWalking [
 
 "Il contrôle sa position"
 self checkPosition.
+(self walkerAction = 'Out') ifTrue: [ ^ self ].
 
 "Il se déplace"		
 (self walkerAction = 'Observation') ifTrue: [ ^ self ].
@@ -437,61 +433,61 @@ self actionCount: 0.
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> walkerAction [
 
 	^ walkerAction
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> walkerAction: anObject [
 
 	walkerAction := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> walkerDestination [
 
 	^ walkerDestination
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> walkerDestination: anObject [
 
 	walkerDestination := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> walkerPath [
 
 	^ walkerPath
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> walkerPath: anObject [
 
 	walkerPath := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> way [
 
 	^ way
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> way: anObject [
 
 	way := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> withBinoculars [
 
 	^ withBinoculars
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalker >> withBinoculars: anObject [
 
 	withBinoculars := anObject

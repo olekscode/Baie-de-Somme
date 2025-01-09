@@ -1,6 +1,6 @@
 Class {
-	#name : #BSHabitatCell,
-	#superclass : #CMSpatialEntityElement,
+	#name : 'BSHabitatCell',
+	#superclass : 'CMSpatialEntityElement',
 	#instVars : [
 		'type',
 		'stomping',
@@ -12,34 +12,35 @@ Class {
 		'numberOfWalker',
 		'way'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> accessRule [
 
 	^ accessRule
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> accessRule: anObject [
 
 	accessRule := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> boatWay [
 
 	^ boatWay
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> boatWay: anObject [
 
 	boatWay := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSHabitatCell >> defineNumberOfWalker [
 
 (self hasOccupantsOfClass: BSWalker) 
@@ -47,7 +48,7 @@ BSHabitatCell >> defineNumberOfWalker [
 	ifFalse: [ numberOfWalker:= 0 ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSHabitatCell >> defineThreatLevelLand [
 
 | arg1 arg2 selec |
@@ -76,7 +77,7 @@ self neighbourhood do: [ :cell | cell theOccupants
 self threatLevel: (arg1 + arg2).
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSHabitatCell >> initialize [
 
 	super initialize.
@@ -86,194 +87,194 @@ BSHabitatCell >> initialize [
 	self stomping: 0.
 ]
 
-{ #category : #initialization }
-BSHabitatCell >> initializeWithRandomHabitat [
-
-	(Cormas random * 100 < 50) ifTrue: [ self type: 'Land' ] ifFalse: [ self type: 'Sea' ].
-	
-
-]
-
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> kayakWay [
 
 	^ kayakWay
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> kayakWay: anObject [
 
 	kayakWay := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> numberOfWalker [
 
 	^ numberOfWalker
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> numberOfWalker: anObject [
 
 	numberOfWalker := anObject
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSHabitatCell >> povAccessRule [
-
-		self accessRule  = 'Sea' ifTrue: [ ^ Color blue ].
-		self accessRule  = 'Land' ifTrue: [ ^ Color yellow ].
+	<pov>
+	
+		self accessRule  = 'Sea' ifTrue: [ ^ CMPointOfView color: Color blue ].
+		self accessRule  = 'Land' ifTrue: [ ^ CMPointOfView color: Color yellow ].
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSHabitatCell >> povBoatWay [
+	<pov>
 
-	self boatWay  = 'Way' ifTrue: [ ^ Color red   ].
-	self boatWay  = 'Not' ifTrue: [ ^ Color black  ].
-	self boatWay  = 'Sea' ifTrue: [ ^ Color blue  ].
-	self boatWay  = 'Land' ifTrue: [ ^ Color yellow  ].
-	self boatWay  = 'Stop 1' ifTrue: [ ^ Color pink  ].
-	self boatWay  = 'Stop 2' ifTrue: [ ^ Color pink  ].
-	self boatWay  = 'Stop 3' ifTrue: [ ^ Color pink  ].
-	self boatWay  = 'Stop 4' ifTrue: [ ^ Color pink  ].
-	self boatWay  = 'Stop 5' ifTrue: [ ^ Color pink  ].
-	self boatWay  = 'Stop 6' ifTrue: [ ^ Color pink  ].
+	self boatWay  = 'Way' ifTrue: [ ^ CMPointOfView color: Color red   ].
+	self boatWay  = 'Not' ifTrue: [ ^ CMPointOfView color: Color black  ].
+	self boatWay  = 'Sea' ifTrue: [ ^ CMPointOfView color: Color blue  ].
+	self boatWay  = 'Land' ifTrue: [ ^ CMPointOfView color: Color yellow  ].
+	self boatWay  = 'Stop 1' ifTrue: [ ^ CMPointOfView color: Color pink  ].
+	self boatWay  = 'Stop 2' ifTrue: [ ^ CMPointOfView color: Color pink  ].
+	self boatWay  = 'Stop 3' ifTrue: [ ^ CMPointOfView color: Color pink  ].
+	self boatWay  = 'Stop 4' ifTrue: [ ^ CMPointOfView color: Color pink  ].
+	self boatWay  = 'Stop 5' ifTrue: [ ^ CMPointOfView color: Color pink  ].
+	self boatWay  = 'Stop 6' ifTrue: [ ^ CMPointOfView color: Color pink  ].
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSHabitatCell >> povHabitatType [
-
-	self type = 'Home' ifTrue: [ ^ Color black  ].
+	<pov>
 	
-	self type = 'Land' ifTrue: [ ^ Color brown ].
+	self type = 'Home' ifTrue: [ ^ CMPointOfView color: Color black  ].
 	
-	self type = 'Sea' ifTrue: [ ^ Color blue ].
+	self type = 'Land' ifTrue: [ ^ CMPointOfView color: Color brown ].
 	
-	self type = 'Home Sea' ifTrue: [ ^ Color black ].
+	self type = 'Sea' ifTrue: [ ^ CMPointOfView color: Color blue ].
 	
-	self type = 'Schorre' ifTrue: [ ^ Color green ].
+	self type = 'Home Sea' ifTrue: [ ^ CMPointOfView color: Color black ].
 	
-	self type = 'Sand' ifTrue: [ ^ Color orange ].
+	self type = 'Schorre' ifTrue: [ ^ CMPointOfView color: Color green ].
 	
-	self type = 'Beach' ifTrue: [ ^ Color yellow ].
+	self type = 'Sand' ifTrue: [ ^ CMPointOfView color: Color orange ].
 	
-	self type = 'City' ifTrue: [ ^ Color black ].
+	self type = 'Beach' ifTrue: [ ^ CMPointOfView color: Color yellow ].
+	
+	self type = 'City' ifTrue: [ ^ CMPointOfView color: Color black ].
+	
+	
 		 
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSHabitatCell >> povKayakWay [
+	<pov>
 
-	self kayakWay  = 'Way' ifTrue: [ ^ Color red   ].
-	self kayakWay  = 'Not' ifTrue: [ ^ Color black  ].
-	self kayakWay  = 'Sea' ifTrue: [ ^ Color blue  ].
-	self kayakWay  = 'Land' ifTrue: [ ^ Color yellow  ].
+	self kayakWay  = 'Way' ifTrue: [ ^ CMPointOfView color: Color red   ].
+	self kayakWay  = 'Not' ifTrue: [ ^ CMPointOfView color: Color black  ].
+	self kayakWay  = 'Sea' ifTrue: [ ^ CMPointOfView color: Color blue  ].
+	self kayakWay  = 'Land' ifTrue: [ ^ CMPointOfView color: Color yellow  ].
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSHabitatCell >> povRestingPlace [
+	<pov>
 
-	self sealRestingPlace  = 'R1' ifTrue: [ ^ Color green ].
-	self sealRestingPlace  = 'BH' ifTrue: [ ^ Color yellow ].
-	self sealRestingPlace  = 'R2' ifTrue: [ ^ Color orange ].
-	self sealRestingPlace  = 'R3 Nord' ifTrue: [ ^ Color green ].
-	self sealRestingPlace  = 'R3 Sud' ifTrue: [ ^ Color green ].
-	self sealRestingPlace  = 'R3' ifTrue: [ ^ Color green ].
-	self sealRestingPlace  = 'R4' ifTrue: [ ^ Color blue ].
-	self sealRestingPlace  = 'R5 Nord' ifTrue: [ ^ Color red ].
-	self sealRestingPlace  = 'R5 Centre' ifTrue: [ ^ Color red ].
-	self sealRestingPlace  = 'R5 Pointe' ifTrue: [ ^ Color red ].
-	self sealRestingPlace  = 'R5 Mollière' ifTrue: [ ^ Color red ].
-	self sealRestingPlace  = 'R5' ifTrue: [ ^ Color red ].
-	self sealRestingPlace  = 'R6' ifTrue: [ ^ Color pink ].
-	self sealRestingPlace  = 'R7 Virage' ifTrue: [ ^ Color purple ].
-	self sealRestingPlace  = 'R7 Apres Passe' ifTrue: [ ^ Color purple ].
-	self sealRestingPlace  = 'R7 Reste' ifTrue: [ ^ Color purple ].
-	self sealRestingPlace  = 'R7' ifTrue: [ ^ Color purple ].
-	self sealRestingPlace  = 'R8' ifTrue: [ ^ Color magenta ].
-	self sealRestingPlace  = 'FM' ifTrue: [ ^ Color cyan ].
-	self sealRestingPlace  = 'Observatory' ifTrue: [ ^ Color yellow ].
-	self sealRestingPlace  = 'Not' ifTrue: [ ^ Color black ].
-	self sealRestingPlace  = 'Empty' ifTrue: [ ^ Color black ].
-	self sealRestingPlace  = 'Land' ifTrue: [ ^ Color brown ].
-	self sealRestingPlace  = 'Sea' ifTrue: [ ^ Color black ].
-	self sealRestingPlace = 'Home' ifTrue: [ ^ Color black ].
+	self sealRestingPlace  = 'R1' ifTrue: [ ^ CMPointOfView color: Color green ].
+	self sealRestingPlace  = 'BH' ifTrue: [ ^ CMPointOfView color: Color yellow ].
+	self sealRestingPlace  = 'R2' ifTrue: [ ^ CMPointOfView color: Color orange ].
+	self sealRestingPlace  = 'R3 Nord' ifTrue: [ ^ CMPointOfView color: Color green ].
+	self sealRestingPlace  = 'R3 Sud' ifTrue: [ ^ CMPointOfView color: Color green ].
+	self sealRestingPlace  = 'R3' ifTrue: [ ^ CMPointOfView color: Color green ].
+	self sealRestingPlace  = 'R4' ifTrue: [ ^ CMPointOfView color: Color blue ].
+	self sealRestingPlace  = 'R5 Nord' ifTrue: [ ^ CMPointOfView color: Color red ].
+	self sealRestingPlace  = 'R5 Centre' ifTrue: [ ^ CMPointOfView color: Color red ].
+	self sealRestingPlace  = 'R5 Pointe' ifTrue: [ ^ CMPointOfView color: Color red ].
+	self sealRestingPlace  = 'R5 Mollière' ifTrue: [ ^ CMPointOfView color: Color red ].
+	self sealRestingPlace  = 'R5' ifTrue: [ ^ CMPointOfView color: Color red ].
+	self sealRestingPlace  = 'R6' ifTrue: [ ^ CMPointOfView color: Color pink ].
+	self sealRestingPlace  = 'R7 Virage' ifTrue: [ ^ CMPointOfView color: Color purple ].
+	self sealRestingPlace  = 'R7 Apres Passe' ifTrue: [ ^ CMPointOfView color: Color purple ].
+	self sealRestingPlace  = 'R7 Reste' ifTrue: [ ^ CMPointOfView color: Color purple ].
+	self sealRestingPlace  = 'R7' ifTrue: [ ^ CMPointOfView color: Color purple ].
+	self sealRestingPlace  = 'R8' ifTrue: [ ^ CMPointOfView color: Color magenta ].
+	self sealRestingPlace  = 'FM' ifTrue: [ ^ CMPointOfView color: Color cyan ].
+	self sealRestingPlace  = 'Observatory' ifTrue: [ ^ CMPointOfView color: Color yellow ].
+	self sealRestingPlace  = 'Not' ifTrue: [ ^ CMPointOfView color: Color black ].
+	self sealRestingPlace  = 'Empty' ifTrue: [ ^ CMPointOfView color: Color black ].
+	self sealRestingPlace  = 'Land' ifTrue: [ ^ CMPointOfView color: Color brown ].
+	self sealRestingPlace  = 'Sea' ifTrue: [ ^ CMPointOfView color: Color black ].
+	self sealRestingPlace = 'Home' ifTrue: [ ^ CMPointOfView color: Color black ].
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSHabitatCell >> povWays [
+	<pov>
 
-		self way  = 'Sea' ifTrue: [ ^ Color blue ].
-		self way  = 'Land' ifTrue: [ ^ Color yellow ].
-		self way  = 'Maye' ifTrue: [ ^ Color red ].
-		self way  = 'Crotoy' ifTrue: [ ^ Color red ].
-		self way  = 'Hourdel' ifTrue: [ ^ Color red ].
-		self way  = 'Hourdel Promenade' ifTrue: [ ^ Color cyan ].
-		self way  = 'Molliere' ifTrue: [ ^ Color cyan ].
+		self way  = 'Sea' ifTrue: [ ^ CMPointOfView color: Color blue ].
+		self way  = 'Land' ifTrue: [ ^ CMPointOfView color: Color yellow ].
+		self way  = 'Maye' ifTrue: [ ^ CMPointOfView color: Color red ].
+		self way  = 'Crotoy' ifTrue: [ ^ CMPointOfView color: Color red ].
+		self way  = 'Hourdel' ifTrue: [ ^ CMPointOfView color: Color red ].
+		self way  = 'Hourdel Promenade' ifTrue: [ ^ CMPointOfView color: Color cyan ].
+		self way  = 'Molliere' ifTrue: [ ^ CMPointOfView color: Color cyan ].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> sealRestingPlace [
 
 	^ sealRestingPlace
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> sealRestingPlace: anObject [
 
 	sealRestingPlace := anObject
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSHabitatCell >> step [
 
 (self type = 'Land')
 ifTrue: [self defineThreatLevelLand].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> stomping [
 
 	^ stomping
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> stomping: anObject [
 
 	stomping := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> threatLevel [
 
 	^ threatLevel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> threatLevel: anObject [
 
 	threatLevel := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> type [
 
 	^ type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> type: anObject [
 
 	type := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> way [
 
 	^ way
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSHabitatCell >> way: anObject [
 
 	way := anObject

@@ -1,44 +1,45 @@
 Class {
-	#name : #BSWalkerAlone,
-	#superclass : #BSWalker,
+	#name : 'BSWalkerAlone',
+	#superclass : 'BSWalker',
 	#instVars : [
 		'destinationMemory'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalkerAlone class >> entityName [
 
 	^ 'PromeneurSeul'
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> checkPosition [
 
 	self walkerPath ifNotEmpty: [ ^ self ].
-	
-	(self patch = self home) ifTrue: [ ^ self walkerAction: 'Out' ].
 
 	self way remove: self patch.
 
 	self defineDestination
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> defineDestination [
 
-	self way ifNotEmpty: [ 
+	self way 
+	ifNotEmpty: [ 
 		self walkerDestination: way first.
 		self walkerPath: (self patch
 				 wayTo: self walkerDestination
 				 constraint: [ :cell | 
-				 cell type = 'Beach' or: [ cell sealRestingPlace = 'Home' ] ]) ].
+				 cell type = 'Beach' or: [ cell sealRestingPlace = 'Home' ] ]) ]
+	ifEmpty: [ ^ self walkerAction: 'Out'].
 	
 	self walkerPath remove: self patch
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> defineVisionWihtBinolucars [
 
 |scope1 scope2|
@@ -57,7 +58,7 @@ BSWalkerAlone >> defineVisionWihtBinolucars [
 	self sight: scope2.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> defineVisionWihtoutBinolucars [
 
 |scope1 scope2|
@@ -70,37 +71,37 @@ BSWalkerAlone >> defineVisionWihtoutBinolucars [
 	self sight: scope2.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalkerAlone >> destinationMemory [
 
 	^ destinationMemory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalkerAlone >> destinationMemory: anObject [
 
 	destinationMemory := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSWalkerAlone >> initialize [ 
 
 | arg |
 
 	super initialize.
-	arg := Cormas random.
+	arg := Random new next.
 
 	(arg < 0.5) 
-		ifTrue: [ groupSize := (Cormas random * 5 + 1) rounded ] 
+		ifTrue: [ groupSize := (Random new next * 5 + 1) rounded ] 
 		ifFalse: [(arg > 0.9) 
-			ifTrue: [ groupSize := (Cormas random * 5 + 11) rounded ]
-			ifFalse: [groupSize := (Cormas random * 5 + 6) rounded]].
+			ifTrue: [ groupSize := (Random new next * 5 + 11) rounded ]
+			ifFalse: [groupSize := (Random new next * 5 + 6) rounded]].
 	
 	sealExpectation := 3.
 	
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> lookForSpot [
 
 self destinationMemory isNotEmpty
@@ -109,7 +110,7 @@ ifTrue: [ ^ self walkerDestination: self destinationMemory atRandom ].
 self moveAlongBeach.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> moveAlongBeach [
 	
 	|potentialDest|
@@ -121,7 +122,7 @@ potentialDest isEmpty ifTrue: [ ^ self uTurn ].
 self walkerDestination: potentialDest atRandom.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> moveToASeal [
 
 	(self patch neighbourhood select: [ :each | each type = 'Sea' ]) isEmpty
@@ -131,14 +132,14 @@ BSWalkerAlone >> moveToASeal [
 	
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> moveToDestination [
 
 self previousCell: self patch.
 self moveInDirectionOf: walkerDestination constraintOnPath: [ :cell | cell type = 'Land' or: [ cell type = 'Home' ] ]
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> moveWalking [
 
 	| candidates |
@@ -152,13 +153,14 @@ BSWalkerAlone >> moveWalking [
 	self walkerPath remove: candidates
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSWalkerAlone >> pov [
+ <pov>
 
-	^ Color red  
+	^ CMPointOfView color: Color red size: 0.7
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSWalkerAlone >> povEnergy [	
 
 	^ self
@@ -168,7 +170,7 @@ BSWalkerAlone >> povEnergy [
 		  color: Color red 
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSWalkerAlone >> povSatisfaction [	
 
 	^ self
@@ -178,7 +180,7 @@ BSWalkerAlone >> povSatisfaction [
 		  color: Color red 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerAlone >> uTurn [
 
 |dest|

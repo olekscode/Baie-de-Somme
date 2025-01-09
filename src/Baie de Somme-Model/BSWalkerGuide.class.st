@@ -1,19 +1,20 @@
 Class {
-	#name : #BSWalkerGuide,
-	#superclass : #BSWalker,
+	#name : 'BSWalkerGuide',
+	#superclass : 'BSWalker',
 	#instVars : [
 		'observatoryMemory'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalkerGuide class >> entityName [
 
 	^ 'PromeneurGuide'
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerGuide >> checkPosition [
 
 	self patch = self walkerDestination ifFalse: [ ^ self ].
@@ -22,7 +23,7 @@ BSWalkerGuide >> checkPosition [
 		^ self changeActionToObservation ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSWalkerGuide >> defineDestination [
 
 self walkerDestination: self way first.
@@ -32,26 +33,26 @@ self walkerPath: (self patch wayTo: (self walkerDestination) constraint: [ :cell
 self walkerPath remove: self patch.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSWalkerGuide >> initialize [ 
 
 | arg |
 
 	super initialize.
-	arg := Cormas random.
+	arg := Random new next.
 
 	(arg < 0.33) 
-		ifTrue: [ groupSize := (Cormas random * 10 + 1) rounded ] 
+		ifTrue: [ groupSize := (Random new next * 10 + 1) rounded ] 
 		ifFalse: [(arg > 0.66) 
-			ifTrue: [ groupSize := (Cormas random * 10 + 21) rounded ]
-			ifFalse: [groupSize := (Cormas random * 10 + 11) rounded]].
+			ifTrue: [ groupSize := (Random new next * 10 + 21) rounded ]
+			ifFalse: [groupSize := (Random new next * 10 + 11) rounded]].
 
 	sealExpectation := 4.
 	
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerGuide >> lookForSpot [
 
 | distanceToObservatory potentialDestination|
@@ -69,21 +70,7 @@ BSWalkerGuide >> lookForSpot [
 	self walkerDestination: (potentialDestination at: (distanceToObservatory first)).
 ]
 
-{ #category : #behavior }
-BSWalkerGuide >> moveAlongBeach [
-	
-	|dest potentialDest|
-(self patch neighbourhood size < 8) ifTrue: [ ^ self uTurn ].
-
-potentialDest := self patch neighbourhood select: [ :cell | cell neighbourhoodAndSelf allSatisfy: [ :y | y ~= self previousCell ]].
-
-dest := potentialDest select: [ :cell | (cell type = 'Land') & (cell neighbourhood anySatisfy: [:y | y type = 'Sea'])].
-(dest isEmpty) ifTrue: [ (Cormas random < 0.5) ifTrue: [dest:= self patch neighbourE]  ifFalse: [dest:= self patch neighbourW]] ifFalse: [ dest := dest first ].
-self previousCell: self patch.
-self moveTo: dest.
-]
-
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerGuide >> moveToASeal [
 
 self moveTowards: (self walkerDestination) constraintOnPath: [:cell | (cell type = 'Land') or: [ cell type = 'Home' ] ].
@@ -92,7 +79,7 @@ self moveTowards: (self walkerDestination) constraintOnPath: [:cell | (cell type
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerGuide >> moveToDestination [
 
 (self walkerDestination sealRestingPlace = 'Observatory')
@@ -103,7 +90,7 @@ energy := energy - 1.
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerGuide >> moveWalking [
 
 	| candidates |
@@ -115,25 +102,26 @@ BSWalkerGuide >> moveWalking [
 	self walkerPath remove: candidates
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalkerGuide >> observatoryMemory [
 
 	^ observatoryMemory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSWalkerGuide >> observatoryMemory: anObject [
 
 	observatoryMemory := anObject
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSWalkerGuide >> pov [
+ <pov>
 
-	^ Color blue
+	^ CMPointOfView color: Color blue size: 0.7
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSWalkerGuide >> povEnergy [
 
 	^ self
@@ -143,7 +131,7 @@ BSWalkerGuide >> povEnergy [
 		  color: Color blue 
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSWalkerGuide >> povSatisfaction [	
 
 	^ self
@@ -153,7 +141,7 @@ BSWalkerGuide >> povSatisfaction [
 		  color: Color blue 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSWalkerGuide >> uTurn [
 
 |dest|

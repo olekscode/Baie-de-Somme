@@ -1,22 +1,23 @@
 Class {
-	#name : #BSBoatKayak,
-	#superclass : #BSBoat,
-	#category : #'Baie de Somme-Model'
+	#name : 'BSBoatKayak',
+	#superclass : 'BSBoat',
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'stepping' }
 BSBoatKayak >> changeActionToNavigate [
 
 self boatAction: 'Navigate'.
 self boatDirection: self wayMemory.
-self actionCount: 10.
+self actionCount: 15.
 
 
 
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'stepping' }
 BSBoatKayak >> changeActionToObservation [
 
 "Cette méthode fait basculer le kayak dans une autre activité: il voit des phoques sur un reposoir et décide de les observer un peu mieux"
@@ -25,12 +26,12 @@ BSBoatKayak >> changeActionToObservation [
 
 self boatAction: 'Observation'. "Le kayak redéfinit son action"
 self wayMemory: self patch. "Le kayak se souvient d'où il en est de son parcours"
-self actionCount: (Cormas random * 10 + 10) rounded. "Le kayak décide combien de temps il va rester observer"
+self actionCount: (Random new next * 10 + 10) rounded. "Le kayak décide combien de temps il va rester observer"
 self boatDirection: (self siteWithSeal atRandom). "Le kayak définit son objectif d'observation"
-self restingPlaceMemory: (self restingPlaceMemory reject: [ :restingPlace | restingPlace = boatDirection sealRestingPlace  ]).
+self restingPlaceMemory: (self restingPlaceMemory reject: [ :restingPlace | restingPlace = boatDirection sealRestingPlace ]). "Le kayak met à jour son parcours"
 
 "Selon sa connaissance de ce qu'il faut faire ou ne pas faire, il peut décider d'aller jusqu'à monter sur le reposoir"
-rand:= Cormas random.
+rand:= Random new next.
 ((self sealAwareness > 1) & (rand > 0.66))
 	ifTrue: [ ^ self changeActionToRepository ].
 	
@@ -39,7 +40,7 @@ self stepObservation.
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'stepping' }
 BSBoatKayak >> changeActionToOnLand [
 
 self boatDirection: self patch.
@@ -47,16 +48,16 @@ self boatAction: 'On Land'.
 self stepOnLandBoat.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'stepping' }
 BSBoatKayak >> changeActionToRepository [
 
 self boatAction: 'Repository'.
-(self actionCount = 0) ifTrue: [ self actionCount: (Cormas random * 10 + 5) rounded ].
+(self actionCount = 0) ifTrue: [ self actionCount: (Random new next * 10 + 5) rounded ].
 sealAwareness := sealAwareness - 1.
 self stepRepository.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoatKayak >> kayakMoveAroundRepository [
 
 "Cette méthode définit le comportement de déplacement du kayakiste autour du reposoir qu'il a décidé d'observer de plus près"
@@ -72,7 +73,7 @@ candidate := self patch neighbourhood select: [ :cell | (cell type = 'Sea') and:
 
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoatKayak >> kayakMoveInWater [
 
 	"Le déplacement du kayakiste est simple. Il suit un chemin qui l'amène à son objectif puis l'amène à rentrer s'il a atteint son objectif"
@@ -97,7 +98,7 @@ BSBoatKayak >> kayakMoveInWater [
 		constraintOnPath: [ :cell | cell kayakWay = 'Way' ]
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoatKayak >> kayakMoveOnLand [
 "Cette méthode définit le mouvement des kayakistes sur la plage"
 | candidates|
@@ -112,7 +113,7 @@ candidates:= self patch neighbourhood select: [ :cell | (cell type = 'Beach') & 
 self moveTo: candidates atRandom.
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoatKayak >> kayakMoveToBeach [
 
 self moveTowards: boatDirection.
@@ -120,7 +121,7 @@ self moveTowards: boatDirection.
 (self actionCount > 0) ifTrue: [ actionCount := actionCount - 1 ].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'behavior' }
 BSBoatKayak >> kayakPrepareToLeave [
 "Si le temps qu'il a passé sur la plage arrive à son terme, il se rapproche de son kayak et se prépare à repartir"
 ((self patch = boatDirection) and: [ self actionCount = 0 ])
@@ -131,19 +132,7 @@ ifFalse: [ self moveTowards: boatDirection constraintOnPath: [ :cell | cell type
 
 ]
 
-{ #category : #'as yet unclassified' }
-BSBoatKayak >> kayakUpdateMemory [
-
-| tempMemory |
-
-self boatDirection ifNil: [ ^ self].
-
-tempMemory := self wayMemory select: [ :cell | cell sealRestingPlace ~= self boatDirection ].
-
-self wayMemory: tempMemory.
-]
-
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoatKayak >> lookAtSealsFromSea [ 
 
 "Le kayak sensibilisé navigue autour des phoques qu'il observe sans les déranger"
@@ -159,18 +148,25 @@ self moveTo: candidatePatch atRandom.
 (actionCount > 0) ifTrue: [ actionCount := actionCount - 1 ].
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSBoatKayak >> pov [
+	<pov>
 
-	self boatAction = 'Out' ifTrue: [ ^ Color blue ].
-
-	^ Color pink
+	self boatAction = 'Out' ifTrue: [ ^ CMPointOfView color: Color blue size: 0.1 ].
+	self boatAction = 'Navigate' ifTrue: [ ^ CMPointOfView color: Color pink shape: #circle size: 0.7 ].
+	self boatAction = 'Repository' ifTrue: [ ^ CMPointOfView color: Color pink shape: #diamond size: 0.7 ].
+	self boatAction = 'Observation' ifTrue: [ ^ CMPointOfView color: Color pink shape: #square size: 0.7 ].
+	self boatAction = 'On Land' ifTrue: [ ^ CMPointOfView color: Color pink shape: #star size: 0.7 ].
+	
+	^ CMPointOfView color: Color pink size: 0.7
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSBoatKayak >> step [
-
+	"Test si le kayak a fini sa ballade"
 	self patch = home & (self energy = 0) ifTrue: [ ^ self boatAction: 'Out' ].
+	(self boatAction = 'Out') ifTrue: [ ^ self ].
+	
 	"Au début de chaque tour on définit ce que voit le bateau"
 	self defineVision.
 	self lookForSeals.
@@ -188,22 +184,22 @@ BSBoatKayak >> step [
 	self energy > 0 ifTrue: [ energy := energy - 1 ]
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSBoatKayak >> stepNavigation [
 
 "Cette méthode définit le comportement du kayak en train de faire sa ballade et de regarder s'il voit des phoques."
 "S'il voit des phoques sur un reposoir et que ce n'est pas l'heure de rentrer il peut décider d'aller passer plus de temps à les voir."
-(self energy = 0) ifTrue: [ ^ self kayakMoveInWater ].
+(self energy = 0) ifTrue: [ ^ self kayakMoveInWater ]. "Vérifie qu'il lui reste de l'énergie"
 
-((self siteWithSeal isNotEmpty) & (self actionCount = 0))
-	ifTrue: [ ^ self changeActionToObservation ].
+((self siteWithSeal isNotEmpty) & (self actionCount = 0)) 
+	ifTrue: [ ^ self changeActionToObservation ]. "S'il voit des phoques sur un reposoir il va les observer"
 
 "S'il ne voit pas de phoque il continue sa route"
 self kayakMoveInWater.
 (self actionCount > 0) ifTrue: [ actionCount := actionCount - 1 ].
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSBoatKayak >> stepObservation [
 
 "Si le kayak a épuisé son temps d'observation il retourne sur son parcours"
@@ -215,7 +211,7 @@ ifTrue: [ self lookAtSealsFromSea ] "Regarder les phoques depuis la mer en resta
 ifFalse: [ self kayakMoveAroundRepository ]. "S'approcher du reposoir pour voir les phoques de plus près"
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSBoatKayak >> stepOnLandBoat [ 
 "Durant cette phase, le kayakiste regarde les phoques dans l'eau autour de lui"
 (self patch neighbourhood anySatisfy: [ :cell | cell hasOccupantsOfClass: BSSeal ])
@@ -229,7 +225,7 @@ ifFalse: [ self kayakMoveOnLand ].
 
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSBoatKayak >> stepRepository [
 
 "On est dans le cas où le kayak décide de s'approcher et d'aller acoster sur le reposoir pour mieux voir les phoques"
@@ -239,7 +235,7 @@ BSBoatKayak >> stepRepository [
 	ifFalse: [ self kayakMoveToBeach ] "S'il est sur l'eau, il s'approche"
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSBoatKayak >> stepStart [ 
 
 self actionCount: 0.

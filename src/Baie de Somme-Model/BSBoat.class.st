@@ -1,6 +1,6 @@
 Class {
-	#name : #BSBoat,
-	#superclass : #CMAgent,
+	#name : 'BSBoat',
+	#superclass : 'CMAgent',
 	#traits : 'TCMLocated',
 	#classTraits : 'TCMLocated classTrait',
 	#instVars : [
@@ -18,58 +18,59 @@ Class {
 		'restingPlaceMemory',
 		'way'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> actionCount [
 
 	^ actionCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> actionCount: anObject [
 
 	actionCount := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> boatAction [
 
 	^ boatAction
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> boatAction: anObject [
 
 	boatAction := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> boatDestination [
 
 	^ boatDestination
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> boatDestination: anObject [
 
 	boatDestination := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> boatDirection [
 
 	^ boatDirection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> boatDirection: anObject [
 
 	boatDirection := anObject
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoat >> defineVision [
 
 	|scope1 scope2|
@@ -85,42 +86,42 @@ BSBoat >> defineVision [
 	self sight: scope2.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> energy [
 
 	^ energy
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> energy: anObject [
 
 	energy := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> home [
 
 	^ home
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> home: anObject [
 
 	home := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSBoat >> initialize [ 
 
 |arg|
 	super initialize.
 	satisfaction := 0.
-	energy := (Cormas random * 100) rounded.
+	energy := (Random new next * 100) rounded.
 	siteWithSeal := OrderedCollection new.
 	self boatAction: 'Navigate'.
 	actionCount := 0.
 	
-	arg:= Cormas random.
+	arg:= Random new next.
 	(arg < 0.2) 
 		ifTrue: [ self sealAwareness: 0] 
 		ifFalse: [ 
@@ -130,7 +131,7 @@ BSBoat >> initialize [
 				
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoat >> lookForSeals [
 
 self siteWithSeal: (self sight select: [ :cell | ((cell hasOccupantsOfClass: BSSeal) & (cell type = 'Beach'))]).
@@ -140,7 +141,7 @@ self siteWithSeal: (self sight select: [ :cell | ((cell hasOccupantsOfClass: BSS
 (self patch hasOccupantsOfClass: BSSeal) ifTrue: [ satisfaction := satisfaction + 1 ].
 ]
 
-{ #category : #moving }
+{ #category : 'moving' }
 BSBoat >> moveInDirectionOf: aCell constraintOnPath: aBlock [
 	"Purpose: moves one cell in direction of a given location, taking a specified constraint on each cell of the path to destination.
 Argument: aCell = <SpatialEntityElement>
@@ -161,80 +162,80 @@ Example: self moveTowards: self house patch constraintOnPath: [:c | c isClosed n
 			candidate isNotEmpty ifTrue: [ self moveTo: candidate atRandom ]] ]
 ]
 
-{ #category : #behavior }
+{ #category : 'behavior' }
 BSBoat >> moveToDestination [ 
 
 "self previousCell: self patch."
 self moveInDirectionOf: boatDestination constraintOnPath: [ :cell | cell kayakWay = 'Way']
 ]
 
-{ #category : #pov }
+{ #category : 'pov' }
 BSBoat >> pov [
-
+	
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> restingPlaceMemory [
 
 	^ restingPlaceMemory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> restingPlaceMemory: anObject [
 
 	restingPlaceMemory := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> satisfaction [
 
 	^ satisfaction
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> satisfaction: anObject [
 
 	satisfaction := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> sealAwareness [
 
 	^ sealAwareness
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> sealAwareness: anObject [
 
 	sealAwareness := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> sight [
 
 	^ sight
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> sight: anObject [
 
 	sight := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> siteWithSeal [
 
 	^ siteWithSeal
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> siteWithSeal: anObject [
 
 	siteWithSeal := anObject
 ]
 
-{ #category : #stepping }
+{ #category : 'stepping' }
 BSBoat >> step [
 
 self subclassResponsibility.
@@ -244,25 +245,25 @@ self subclassResponsibility.
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> way [
 
 	^ way
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> way: anObject [
 
 	way := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> wayMemory [
 
 	^ wayMemory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSBoat >> wayMemory: anObject [
 
 	wayMemory := anObject

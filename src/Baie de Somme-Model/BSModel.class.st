@@ -1,6 +1,6 @@
 Class {
-	#name : #BSModel,
-	#superclass : #CMAbstractModel,
+	#name : 'BSModel',
+	#superclass : 'CMAbstractModel',
 	#instVars : [
 		'theHabitatTypes',
 		'theWalkerGuides',
@@ -19,76 +19,34 @@ Class {
 		'ways',
 		'timer'
 	],
-	#category : #'Baie de Somme-Model'
+	#category : 'Baie de Somme-Model',
+	#package : 'Baie de Somme-Model'
 }
 
-{ #category : #'- probes' }
+{ #category : '- probes' }
 BSModel class >> colorOfProbe_numberOfPromeneurGuides [
   ^ (Color r: 1.0 g: 0.20234604105571846 b: 0.0 alpha: 1.0)
 ]
 
-{ #category : #'simulation settings' }
+{ #category : 'simulation settings' }
 BSModel class >> defaultInit [
 
 	^ #simpleEnvironment
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel class >> initialNumberOfPromeneurGuides [
 
 	^10
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel class >> initialNumberOfPromeneurSeuls [
 
 	^2
 ]
 
-{ #category : #'as yet unclassified' }
-BSModel >> accessRuleMatrix [
-
-	| matrix |
-	
-	matrix := #(
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 1 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 1 1 0 0)
-		(0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
-		(0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0)
-		(0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)).
-		
-	(matrix size = numberOfRows and: [ matrix allSatisfy: [ :row | row size = numberOfColumns ] ])
-		ifFalse: [ self error: 'Matrix has the wrong dimensions' ].
-		
-	^ matrix
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> complexAccessRuleMatrix [
 
 	| matrix |
@@ -217,7 +175,7 @@ BSModel >> complexAccessRuleMatrix [
 	^ matrix
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> complexKayakWayMatrix [
 
 	| matrix |
@@ -346,7 +304,7 @@ BSModel >> complexKayakWayMatrix [
 	^ matrix
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> complexLowHabitatTypeMatrix [
 
 	| matrix |
@@ -475,7 +433,7 @@ BSModel >> complexLowHabitatTypeMatrix [
 	^ matrix
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> complexSealRestingPlaceMatrix [
 
 	| matrix |
@@ -604,14 +562,14 @@ BSModel >> complexSealRestingPlaceMatrix [
 	^ matrix
 ]
 
-{ #category : #probes }
+{ #category : 'probes' }
 BSModel >> habitatStomping [
 
 	<probe>
 	^ self theSensitiveHabitats sum: [ :each | each stomping ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> habitatTypeMatrix [
 
 	| matrix |
@@ -654,7 +612,7 @@ BSModel >> habitatTypeMatrix [
 	^ matrix
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initialize [ 
 
 	super initialize.
@@ -670,7 +628,7 @@ BSModel >> initialize [
 	timer := 0.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initializeAccessRuleFromMatrix: grid [
 
 	| matrixCellValue modelCell matrix |
@@ -774,7 +732,7 @@ BSModel >> initializeAccessRuleFromMatrix: grid [
 			] ]
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeAgents [ 
 
 	self
@@ -803,7 +761,7 @@ BSModel >> initializeAgents [
 
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeBoatKayak [
 
 | boat clonedWay |
@@ -827,7 +785,7 @@ BSModel >> initializeBoatKayak [
 	boat restingPlaceMemory: self restingPlaces. 
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeBoatMotorized [
 
 | boat |
@@ -847,7 +805,7 @@ BSModel >> initializeBoatMotorized [
 	boat boatDestination add: boat home.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initializeBoatWayFromMatrix: grid [
 
 	| matrixCellValue modelCell matrix |
@@ -870,7 +828,7 @@ BSModel >> initializeBoatWayFromMatrix: grid [
 			] ]
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeComplexAgents [ 
 
 	self
@@ -899,12 +857,12 @@ BSModel >> initializeComplexAgents [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initializeGrid: grid [
 	
 	self
-		createGridLines: numberOfRows
-		columns: numberOfColumns
+		createGridNumberOfRows: numberOfRows
+		numberOfColumns: numberOfColumns
 		neighbourhood: 8
 		closed: true.
 
@@ -919,7 +877,7 @@ BSModel >> initializeGrid: grid [
 		 ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initializeHabitatTypeFromMatrix: grid [
 
 	| matrixCellValue modelCell matrix |
@@ -939,7 +897,7 @@ BSModel >> initializeHabitatTypeFromMatrix: grid [
 			] ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initializeKayakWayFromMatrix: grid [
 
 	| matrixCellValue modelCell matrix |
@@ -956,7 +914,7 @@ BSModel >> initializeKayakWayFromMatrix: grid [
 			] ]
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeRestingPlaces [
 
 | counter |
@@ -972,7 +930,7 @@ self theRestingPlaces do: [ :each |
 	].
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initializeSealRestingPlacesFromMatrix: grid [
 
 	| matrixCellValue modelCell matrix |
@@ -1006,7 +964,7 @@ BSModel >> initializeSealRestingPlacesFromMatrix: grid [
 			] ]
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeSeals: numberOfSeals [
 	
 	self createN: numberOfSeals randomlyLocatedEntities: BSSeal constrainedBy: [ :cell | cell type = 'Sea' ].
@@ -1019,13 +977,13 @@ BSModel >> initializeSeals: numberOfSeals [
 
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeWalkerAlone [
 
 self initializeWalkerAloneHourdel.
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeWalkerAloneHourdel [
 
 	| guide clonedWay |
@@ -1039,21 +997,21 @@ BSModel >> initializeWalkerAloneHourdel [
 	guide walkerDestination: guide way first.
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeWalkerGuide [
 
 	| guide rand clonedWay |
 	self createN: 1 entity: BSWalkerGuide.
 
 	guide := theWalkerGuides last.
-	rand := Cormas random.
+	rand := Random new next.
 
 	"Changer les pourcentages pour varier le nombre d'apparition de guides d'un point à un autre"
 	"Départ du Maye"
 	rand < 0.05 ifTrue: [ 
 		guide home: (self theHomes select: [ :x | x way = 'Maye' ]) first.
 		guide moveTo: guide home.
-		clonedWay := Cormas random < 0.33
+		clonedWay := Random new next < 0.33
 			             ifTrue: [ (self waysDictionary at: #Maye1) copy ]
 			             ifFalse: [ (self waysDictionary at: #Maye2) copy ].
 		^ guide way: clonedWay ].
@@ -1061,7 +1019,7 @@ BSModel >> initializeWalkerGuide [
 	rand > 0.95 ifTrue: [ 
 		guide home: (self theHomes select: [ :x | x way = 'Crotoy' ]) first.
 		guide moveTo: guide home.
-		clonedWay := Cormas random < 0.66
+		clonedWay := Random new next < 0.66
 			             ifTrue: [ (self waysDictionary at: #Crotoy1) copy ]
 			             ifFalse: [ (self waysDictionary at: #Crotoy2) copy ].
 		^ guide way: clonedWay ].
@@ -1072,7 +1030,7 @@ BSModel >> initializeWalkerGuide [
 	guide way: clonedWay
 ]
 
-{ #category : #'init entities' }
+{ #category : 'init entities' }
 BSModel >> initializeWays [
 
 	| way selectionOfCells |
@@ -1149,7 +1107,7 @@ BSModel >> initializeWays [
 	waysDictionary at: #KayakLong put: way
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSModel >> initializeWaysFromMatrix: grid [
 
 	| matrixCellValue modelCell matrix |
@@ -1170,14 +1128,14 @@ BSModel >> initializeWaysFromMatrix: grid [
 			] ]
 ]
 
-{ #category : #probes }
+{ #category : 'probes' }
 BSModel >> kayakSatisfaction [
 
 	<probe>
 	^ (self theBoatKayaks sum: [ :each | each satisfaction ])
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> kayakWayMatrix [
 
 	| matrix |
@@ -1220,19 +1178,19 @@ BSModel >> kayakWayMatrix [
 	^ matrix
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> numberOfColumns [
 
 	^ numberOfColumns
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> numberOfColumns: anObject [
 
 	numberOfColumns := anObject
 ]
 
-{ #category : #probes }
+{ #category : 'probes' }
 BSModel >> numberOfDisturbance [
 
 	<probe>
@@ -1240,50 +1198,50 @@ BSModel >> numberOfDisturbance [
     ^ self theSeals inject: 0 into: [ :sum :seal | sum + seal disturbanceCount ].
 ]
 
-{ #category : #probes }
+{ #category : 'probes' }
 BSModel >> numberOfKayak [
 
 	<probe>
 	^ self theWalkerGuides size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> numberOfRows [
 
 	^ numberOfRows
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> numberOfRows: anObject [
 
 	numberOfRows := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> placeSeals [
 	
 	| a sealSelection |
 self restingPlaces do: [ :restingPlace | 
-	a := Cormas random.
+	a := Random new next.
 	(a < 0.1) ifTrue: [ 
 		sealSelection := self theSeals select: [ :seal | seal restingPlace = restingPlace ].
 		sealSelection do: [ :seal | seal randomJumpConstrainedBy: [ :cell | cell sealRestingPlace = restingPlace ] ] 		] 
 	].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> restingPlaces [
 
 	^ restingPlaces
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> restingPlaces: anObject [
 
 	restingPlaces := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 BSModel >> sealRestingPlaceMatrix [
 
 	| matrix |
@@ -1412,7 +1370,7 @@ BSModel >> sealRestingPlaceMatrix [
 	^ matrix
 ]
 
-{ #category : #matrix }
+{ #category : 'matrix' }
 BSModel >> simpleAccessRuleMatrix [
 
 	| matrix |
@@ -1462,7 +1420,7 @@ BSModel >> simpleAccessRuleMatrix [
 	^ matrix
 ]
 
-{ #category : #matrix }
+{ #category : 'matrix' }
 BSModel >> simpleBoatWayMatrix [
 
 	| matrix |
@@ -1512,9 +1470,9 @@ BSModel >> simpleBoatWayMatrix [
 	^ matrix
 ]
 
-{ #category : #init }
+{ #category : 'init' }
 BSModel >> simpleEnvironmentLowTide [
-
+	<init>
 	| grid numberOfSeals |
 	"1 - Construction de la grille""1.1 - Définition des conditions d'initialisation"
 	grid := 'Simple'.
@@ -1543,11 +1501,9 @@ BSModel >> simpleEnvironmentLowTide [
 	self theSeals do: [ :seal | seal stepSealStart ].
 
 	"3. Création des POV"
-	self
-		displayPov: #povHabitatType of: BSHabitatCell;
-		displayPov: #defaultPOV of: BSWalker;
-		displayPov: #defaultPOV of: BSBoat;
-		displayPov: #defaultPOV of: BSSeal
+	BSHabitatCell activePovSelector: #povHabitatType.
+	"BSWalker activePovSelector: #pov."
+	
 
 
 	"self initializeWalkerGuide."
@@ -1568,7 +1524,7 @@ BSModel >> simpleEnvironmentLowTide [
 	self theSeals do: [ :seal | (Cormas random < 0.5) ifTrue: [ seal randomJumpConstrainedBy: [ :cell | cell sealRestingPlace = seal restingPlace. ] ] ]."
 ]
 
-{ #category : #matrix }
+{ #category : 'matrix' }
 BSModel >> simpleKayakWayMatrix [
 
 	| matrix |
@@ -1618,7 +1574,7 @@ BSModel >> simpleKayakWayMatrix [
 	^ matrix
 ]
 
-{ #category : #matrix }
+{ #category : 'matrix' }
 BSModel >> simpleLowHabitatTypeMatrix [
 
 	| matrix |
@@ -1668,7 +1624,7 @@ BSModel >> simpleLowHabitatTypeMatrix [
 	^ matrix
 ]
 
-{ #category : #matrix }
+{ #category : 'matrix' }
 BSModel >> simpleSealRestingPlaceMatrix [
 
 	| matrix |
@@ -1718,7 +1674,7 @@ BSModel >> simpleSealRestingPlaceMatrix [
 	^ matrix
 ]
 
-{ #category : #matrix }
+{ #category : 'matrix' }
 BSModel >> simpleWalkerWayMatrix [
 
 	| matrix |
@@ -1768,9 +1724,9 @@ BSModel >> simpleWalkerWayMatrix [
 	^ matrix
 ]
 
-{ #category : #control }
+{ #category : 'control' }
 BSModel >> step: anObject [
-
+	<control>
 	| proba |
 	self askRandom: BSWalker toDo: #step.
 
@@ -1780,184 +1736,184 @@ BSModel >> step: anObject [
 
 	"Création des kayaks"
 	proba := -0.0075 * theBoatKayaks size + 0.15.
-	Cormas random < proba ifTrue: [ self initializeBoatKayak ].
+		Random new next < proba ifTrue: [ self initializeBoatKayak ].
 
 	"Création des bateaux à moteur"
 	timer < 40 ifTrue: [ 
 		self theBoatMotorizeds ifEmpty: [ 
-			Cormas random < 0.1 ifTrue: [ self initializeBoatMotorized ] ] ].
+			Random new next < 0.1 ifTrue: [ self initializeBoatMotorized ] ] ].
 
 	timer > 60 ifTrue: [ 
 		self theBoatMotorizeds size < 2 ifTrue: [ 
-			Cormas random < 0.1 ifTrue: [ self initializeBoatMotorized ] ] ].
+			Random new next < 0.1 ifTrue: [ self initializeBoatMotorized ] ] ].
 
 	"Création des promeneurs avec guide"
 	proba := -0.0075 * theWalkerGuides size + 0.15.
-	Cormas random < proba ifTrue: [ self initializeWalkerGuide ].
+	Random new next < proba ifTrue: [ self initializeWalkerGuide ].
 
 	"Création des promeneurs au départ du Hourdel"
-	Cormas random < 0.1 ifTrue: [ self initializeWalkerAloneHourdel ].
+	Random new next < 0.1 ifTrue: [ self initializeWalkerAloneHourdel ].
 
 	timer := timer + 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theBoatKayaks [
 	<getterFor: #BSBoatKayak>
 		
 	^ theBoatKayaks
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theBoatKayaks: anObject [
 
 	theBoatKayaks := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theBoatMotorizeds [
 	<getterFor: #BSBoatMotorized>
 
 	^ theBoatMotorizeds
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theBoatMotorizeds: anObject [
 
 	theBoatMotorizeds := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theHabitatTypes [
 	<getterFor: #BSHabitatCell>
 
 	^ theHabitatTypes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theHabitatTypes: anObject [
 
 	theHabitatTypes := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theHomes [
 
 	^ theHomes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theHomes: anObject [
 
 	theHomes := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theRestingPlaces [
 	<getterFor: #BSRepository>
 
 	^ theRestingPlaces
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theRestingPlaces: anObject [
 
 	theRestingPlaces := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theSeals [
 <getterFor: #BSSeal >
 	^ theSeals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theSeals: anObject [
 
 	theSeals := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theSensitiveHabitats [
 
 	^ theSensitiveHabitats
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theSensitiveHabitats: anObject [
 
 	theSensitiveHabitats := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theWalkerAlones [
 	<getterFor: #BSWalkerAlone>
 
 	^ theWalkerAlones
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theWalkerAlones: anObject [
 
 	theWalkerAlones := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theWalkerGuides [
 	<getterFor: #BSWalkerGuide>	
 
 	^ theWalkerGuides
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theWalkerGuides: anObject [
 
 	theWalkerGuides := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theWays [
 
 	^ theWays
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> theWays: anObject [
 
 	theWays := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> timer [
 
 	^ timer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> timer: anObject [
 
 	timer := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> ways [
 
 	^ ways
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> ways: anObject [
 
 	ways := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> waysDictionary [
 
 	^ waysDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BSModel >> waysDictionary: anObject [
 
 	waysDictionary := anObject
