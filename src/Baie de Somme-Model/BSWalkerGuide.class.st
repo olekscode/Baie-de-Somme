@@ -26,7 +26,8 @@ BSWalkerGuide >> checkPosition [
 { #category : 'as yet unclassified' }
 BSWalkerGuide >> defineDestination [
 
-self walkerDestination: self way first.
+self way ifEmpty: [ self walkerDestination: self home ]
+ ifNotEmpty: [ self walkerDestination: self way first ].
 
 self walkerPath: (self patch wayTo: (self walkerDestination) constraint: [ :cell | cell accessRule = 'Land' ]).
 
@@ -117,28 +118,12 @@ BSWalkerGuide >> observatoryMemory: anObject [
 { #category : 'pov' }
 BSWalkerGuide >> pov [
  <pov>
-
+	
+	self walkerAction = 'Out' ifTrue: [ ^ CMPointOfView color: Color black size: 0.0001 ].
+	self walkerAction = 'Walking' ifTrue: [ ^ CMPointOfView color: Color blue shape: #circle size: 0.7 ].
+	self walkerAction = 'Observation' ifTrue: [ ^ CMPointOfView color: Color blue shape: #square size: 0.7 ].
+	
 	^ CMPointOfView color: Color blue size: 0.7
-]
-
-{ #category : 'pov' }
-BSWalkerGuide >> povEnergy [
-
-	^ self
-		  povAttribute: #energy
-		  min: 0
-		  max: 180
-		  color: Color blue 
-]
-
-{ #category : 'pov' }
-BSWalkerGuide >> povSatisfaction [	
-
-	^ self
-		  povAttribute: #satisfaction
-		  min: 0
-		  max: 180
-		  color: Color blue 
 ]
 
 { #category : 'behavior' }

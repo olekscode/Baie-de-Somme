@@ -1,3 +1,11 @@
+"
+""BSBoat represents a boat (typically a kayak) in the Baie de Somme simulation.
+This class implements the behavior of boats navigating through the bay, including:
+- Navigation between destinations
+- Seal observation and awareness
+- Energy and satisfaction management
+- Memory of visited locations and routes""
+"
 Class {
 	#name : 'BSBoat',
 	#superclass : 'CMAgent',

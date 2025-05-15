@@ -36,31 +36,29 @@ BSWalker >> actionCount: anObject [
 	actionCount := anObject
 ]
 
-{ #category : 'behavior' }
+{ #category : 'control' }
 BSWalker >> changeActionToEnded [
 
 self walkerAction: 'Ended'.
 ]
 
-{ #category : 'behavior' }
+{ #category : 'control' }
 BSWalker >> changeActionToObservation [ 
 
 self walkerAction: 'Observation'.
 
 self siteWithSeal ifEmpty: [ self actionCount: (Random new next * 10 + 10) rounded ]
- ifNotEmpty: [ self actionCount: (Random new next * 10 + 20) rounded ].
+ ifNotEmpty: [ self actionCount: (Random new next * 10 + 30) rounded ].
 
 
 ]
 
-{ #category : 'behavior' }
+{ #category : 'control' }
 BSWalker >> changeActionToWalking [
 
 self walkerAction: 'Walking'.
 
-self way 
-ifEmpty: [ ^ self changeActionToEnded ] 
-ifNotEmpty: [ self defineDestination.].
+self defineDestination.
 	
 self actionCount: 1.
 ]
@@ -165,6 +163,14 @@ BSWalker >> interestingDetails [
 { #category : 'behavior' }
 BSWalker >> lookAtSeals [
 
+| seals people |
+seals := 0.
+people := 0.
+
+self siteWithSeal isNotEmpty ifTrue: [ seals := 1 ].
+
+((self sight anySatisfy: [ :cell | cell hasOccupantsOfClass: BSWalker ]) or: [ self sight anySatisfy: [ :cell | cell hasOccupantsOfClass: BSBoat ]]) ifTrue: [ people := 1].
+
 (self sealAwareness = 'yes')
 	ifTrue: [ ^ self lookAtSealsAware ]
 	ifFalse: [ ^ self lookAtSealsNotAware ]
@@ -187,15 +193,10 @@ self patch allOccupants do: [ :walker | numberOfWalkers := numberOfWalkers + wal
 { #category : 'behavior' }
 BSWalker >> lookAtSealsNotAware [
 
-"Quel est le timing de l'action?"
-(self actionCount \\ 2 = 0) ifFalse: [ ^ self ].
-
 "On contrôle si le promeneur voit toujours des phoques sur le reposoir"
 (self siteWithSeal)
 	ifNotEmpty: [ self moveTowards: (self siteWithSeal atRandom) constraintOnPath: [ :cell | cell accessRule = 'Land' ] ] "S'il voit des phoques il se rapproche"
-	ifEmpty: [ self moveOnRepository ]. "S'ile ne voit pas de phoque il bouge sur le reposoir"
-	
-self actionCount: self actionCount - 1.
+	ifEmpty: [ self moveOnRepository ]. "S'il ne voit pas de phoque il bouge sur le reposoir"
 ]
 
 { #category : 'behavior' }
@@ -247,6 +248,9 @@ candidates := self patch neighbourhood select: [ :cell |
 candidates := candidates select: [ :cell |
 	cell accessRule = 'Land' ].
 
+candidates
+	ifEmpty: [ candidates := self sight select: [ :cell | cell type = 'Sea' ] ].
+
 candidates 
 	ifEmpty: [ self randomWalkConstrainedBy: [ :cell | cell accessRule = 'Land' ] ] 
 	ifNotEmpty: [ self moveTo: candidates atRandom ]
@@ -270,7 +274,7 @@ self subclassResponsibility.
 
 { #category : 'pov' }
 BSWalker >> pov [
-
+	<pov>
 	self subclassResponsibility
 ]
 
@@ -374,8 +378,9 @@ BSWalker >> siteWithSeal: anObject [
 { #category : 'control' }
 BSWalker >> step [
 	"Test si le groupe de promenade a fini sa ballade"
-	((self patch = home) & (self energy = 0)) ifTrue: [ ^ self walkerAction: 'Out' ].
 	(self walkerAction = 'Out') ifTrue: [ ^ self ].
+	self way ifEmpty: [ self patch = self home ifTrue: [ ^ self walkerAction: 'Out' ] ].
+	((self patch = home) & (self energy = 0)) ifTrue: [ ^ self walkerAction: 'Out' ].
 
 	"Définit ce que voit le groupe guidé"
 	self defineVision.
@@ -395,14 +400,14 @@ BSWalker >> stepObservation [
 	"Si le kayak a épuisé son temps d'observation il retourne sur son parcours"
 
 	(self actionCount = 0) ifTrue: [ ^ self changeActionToWalking ].
-
+	self actionCount: self actionCount - 1.
+	
 	"En fonction de sa connaissance de ce qu'il faut faire, le promeneur peut avoir deux sortes de comportements"
 	(self sealAwareness = 0)
-		ifTrue: [ "Regarder les phoques en restant à bonne distance" 
-			^ self lookAtSealsAware ]
+		ifTrue: [ self lookAtSealsAware ] "Regarder les phoques en restant à bonne distance"
 		ifFalse: [ self lookAtSealsNotAware ]. "S'approcher du reposoir pour voir les phoques de plus près"
 
-	self actionCount: self actionCount - 1
+	
 ]
 
 { #category : 'control' }

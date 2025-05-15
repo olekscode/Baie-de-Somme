@@ -205,6 +205,7 @@ BSHabitatCell >> povWays [
 	<pov>
 
 		self way  = 'Sea' ifTrue: [ ^ CMPointOfView color: Color blue ].
+		self way  = 'Kayak' ifTrue: [ ^ CMPointOfView color: Color blue ].
 		self way  = 'Land' ifTrue: [ ^ CMPointOfView color: Color yellow ].
 		self way  = 'Maye' ifTrue: [ ^ CMPointOfView color: Color red ].
 		self way  = 'Crotoy' ifTrue: [ ^ CMPointOfView color: Color red ].

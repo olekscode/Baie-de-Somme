@@ -156,28 +156,11 @@ BSWalkerAlone >> moveWalking [
 { #category : 'pov' }
 BSWalkerAlone >> pov [
  <pov>
-
+	self walkerAction = 'Out' ifTrue: [ ^ CMPointOfView color: Color black size: 0.0001 ].
+	self walkerAction = 'Walking' ifTrue: [ ^ CMPointOfView color: Color red shape: #circle size: 0.7 ].
+	self walkerAction = 'Observation' ifTrue: [ ^ CMPointOfView color: Color red shape: #square size: 0.7 ].
+	
 	^ CMPointOfView color: Color red size: 0.7
-]
-
-{ #category : 'pov' }
-BSWalkerAlone >> povEnergy [	
-
-	^ self
-		  povAttribute: #energy
-		  min: 0
-		  max: 180
-		  color: Color red 
-]
-
-{ #category : 'pov' }
-BSWalkerAlone >> povSatisfaction [	
-
-	^ self
-		  povAttribute: #satisfaction
-		  min: 0
-		  max: 180
-		  color: Color red 
 ]
 
 { #category : 'behavior' }
