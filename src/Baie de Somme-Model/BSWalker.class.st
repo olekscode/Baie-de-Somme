@@ -1,55 +1,56 @@
+"BSWalker is the base class for all walkers in the Baie de Somme simulation.
+It represents visitors to the bay and implements their basic behaviors and attributes.
+Walkers can be either guided (BSWalkerGuide) or independent (BSWalkerAlone)."
+
 Class {
 	#name : #BSWalker,
 	#superclass : #CMAgent,
 	#traits : 'TCMLocated',
 	#classTraits : 'TCMLocated classTrait',
 	#instVars : [
-		'home',
-		'way',
-		'satisfaction',
-		'energy',
-		'previousCell',
-		'sight',
-		'walkerAction',
-		'sealExpectation',
-		'groupSize',
-		'siteWithSeal',
-		'walkerDestination',
-		'walkerPath',
-		'sealAwareness',
-		'actionCount',
-		'withBinoculars'
+		'home',			"Starting location of the walker"
+		'way',			"Current path being followed"
+		'satisfaction',		"Walker's satisfaction level (0-100)"
+		'energy',		"Walker's energy level"
+		'previousCell',		"Last visited cell"
+		'sight',		"Visual range of the walker"
+		'walkerAction',		"Current action (e.g., 'Observation', 'Moving')"
+		'sealExpectation',	"Expectation of seeing seals"
+		'groupSize',		"Size of the walking group"
+		'siteWithSeal',		"Location where seals are observed"
+		'walkerDestination',	"Target location"
+		'walkerPath',		"Planned path to destination"
+		'sealAwareness',	"Knowledge of seal locations"
+		'actionCount',		"Counter for current action"
+		'withBinoculars'	"Whether using binoculars"
 	],
 	#category : #'Baie de Somme-Model'
 }
 
+"Returns the current action count"
 { #category : #accessing }
 BSWalker >> actionCount [
-
 	^ actionCount
 ]
 
+"Sets the action count to the specified value"
 { #category : #accessing }
 BSWalker >> actionCount: anObject [
-
 	actionCount := anObject
 ]
 
+"Changes the walker's action to 'Ended', indicating the walk is complete"
 { #category : #behavior }
 BSWalker >> changeActionToEnded [
-
-self walkerAction: 'Ended'.
+	self walkerAction: 'Ended'.
 ]
 
+"Changes the walker's action to 'Observation' and sets an appropriate observation duration"
 { #category : #behavior }
 BSWalker >> changeActionToObservation [ 
-
-self walkerAction: 'Observation'.
-
-self siteWithSeal ifEmpty: [ self actionCount: (Cormas random * 10 + 10) rounded ]
- ifNotEmpty: [ self actionCount: (Cormas random * 10 + 20) rounded ].
-
-
+	self walkerAction: 'Observation'.
+	self siteWithSeal ifEmpty: [ self actionCount: (Cormas random * 10 + 10) rounded ]
+		ifNotEmpty: [ self actionCount: (Cormas random * 10 + 20) rounded ].
 ]
 
 { #category : #behavior }
