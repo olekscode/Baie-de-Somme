@@ -1,8 +1,8 @@
 Class {
 	#name : 'BaselineOfBSModel',
 	#superclass : 'BaselineOf',
-	#category : 'BaselineOfBaie de Somme-Model',
-	#package : 'BaselineOfBaie de Somme-Model'
+	#category : 'BaselineOfBSModel',
+	#package : 'BaselineOfBSModel'
 }
 
 { #category : 'baselines' }
@@ -13,5 +13,5 @@ BaselineOfBSModel >> baseline: spec [
 		"Packages"
 		spec
 			package: 'Baie de Somme-Model';
-			package: 'Baie de Somme Model-Model-Tests' with: [ spec requires: #( 'Baie de Somme-Model' ) ] ]
+			package: 'Baie de Somme-Model-Tests' with: [ spec requires: #( 'Baie de Somme-Model' ) ] ]
 ]
