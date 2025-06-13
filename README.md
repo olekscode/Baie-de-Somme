@@ -12,6 +12,6 @@ Metacello new
 
 Metacello new
     repository: 'github://pierreScemama/Baie-de-Somme:main';
-    baseline: 'Baie de Somme-Model';
+    baseline: 'BSModel';
     load.
 ```
