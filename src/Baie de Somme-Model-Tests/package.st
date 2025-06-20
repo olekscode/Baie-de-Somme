@@ -1,1 +1,1 @@
-Package { #name : #'Baie de Somme-Model-Tests' }
+Package { #name : 'Baie de Somme-Model-Tests' }

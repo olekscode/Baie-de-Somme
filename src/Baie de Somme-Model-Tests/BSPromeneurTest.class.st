@@ -1,14 +1,15 @@
 Class {
-	#name : #BSPromeneurTest,
-	#superclass : #TestCase,
+	#name : 'BSPromeneurTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'promeneurGuide',
 		'promeneurSeul'
 	],
-	#category : #'Baie de Somme-Model-Tests'
+	#category : 'Baie de Somme-Model-Tests',
+	#package : 'Baie de Somme-Model-Tests'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSPromeneurTest >> setUp [
 
 	super setUp.
@@ -17,10 +18,10 @@ BSPromeneurTest >> setUp [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BSPromeneurTest >> testPov [
 
-	self assert: promeneurGuide pov isColor.
-	self assert: promeneurSeul pov isColor.
+	self assert: (promeneurGuide pov isKindOf: CMPointOfView).
+	self assert: (promeneurSeul pov isKindOf: CMPointOfView).
 	self deny: promeneurGuide pov equals: promeneurSeul pov.
 ]
